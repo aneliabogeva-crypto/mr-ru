@@ -18,6 +18,13 @@ npm run build     # продукционна версия в dist/
 npm run preview   # преглед на dist/
 ```
 
+## Публикуване
+
+Сайтът се публикува автоматично в GitHub Pages при всеки push в `main`
+(`.github/workflows/deploy.yml`): https://aneliabogeva-crypto.github.io/mr-ru/
+
+Еднократна настройка: Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+
 ## Структура
 
 ```
