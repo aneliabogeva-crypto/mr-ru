@@ -386,3 +386,36 @@ tr.off td{color:var(--muted)}
   .room-sec-h{padding:12px 14px}
   .opt,.tog{min-height:48px}
 }
+
+/* ═══ Начален екран: избор на помещение ═════════════════════════════════ */
+.rooms-start{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(200px,100%),1fr));gap:14px;margin-bottom:24px}
+.room-tile{display:grid;justify-items:start;gap:4px;padding:18px 18px 16px;text-align:left;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink);cursor:pointer;transition:border-color .15s ease,transform .15s ease,box-shadow .15s ease}
+.room-tile:hover{border-color:var(--teal);box-shadow:var(--shadow)}
+@media (prefers-reduced-motion:no-preference){.room-tile:hover{transform:translateY(-2px)}}
+.room-tile .room-ico{display:grid;place-items:center;width:52px;height:52px;border-radius:12px;background:var(--teal-soft);color:var(--teal);margin-bottom:8px}
+.room-tile .room-name{font-family:var(--f-display);font-size:18px;font-weight:700;letter-spacing:-.01em}
+.room-tile .room-meta{font-size:13px;color:var(--muted)}
+.room-tile .room-from{font-size:15px;font-weight:700;color:var(--teal);margin-top:4px}
+.room-tile .room-cta{margin-top:10px;font-size:13px;font-weight:600;color:var(--amber-ink);background:var(--amber);border-radius:999px;padding:5px 12px}
+
+.room-bar{display:flex;align-items:center;gap:12px;margin-bottom:16px;min-width:0}
+.room-bar .back{flex:none}
+.rooms-compact{flex:1;min-width:0;margin-bottom:0;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(96px,1fr);overflow-x:auto;scrollbar-width:none;padding:2px}
+.rooms-compact::-webkit-scrollbar{display:none}
+.rooms-compact .room-card{grid-template-columns:auto 1fr;justify-items:start;align-items:center;padding:8px 12px;gap:8px;font-size:13.5px}
+.choice-block{gap:8px}
+.num-field{max-width:220px}
+.num-field .opt-hint{display:block}
+
+@media (max-width:900px){
+  .room-bar{flex-direction:column;align-items:stretch;gap:8px}
+  .room-bar .back{align-self:flex-start}
+  .rooms-compact{margin-inline:-16px;padding:2px 16px 4px}
+}
+@media (max-width:560px){
+  .rooms-start{grid-template-columns:1fr 1fr;gap:10px}
+  .room-tile{padding:14px 12px 12px}
+  .room-tile .room-ico{width:44px;height:44px;margin-bottom:4px}
+  .room-tile .room-name{font-size:16px}
+  .room-tile .room-cta{display:none}
+}

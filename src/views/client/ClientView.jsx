@@ -4,13 +4,13 @@ import EstimatePanel from "./EstimatePanel.jsx";
 import ContractorCard from "./ContractorCard.jsx";
 import MobileEstimateBar from "./MobileEstimateBar.jsx";
 import RoomPicker from "./rooms/RoomPicker.jsx";
-import BathroomConfigurator from "./rooms/BathroomConfigurator.jsx";
+import RoomConfigurator from "./rooms/RoomConfigurator.jsx";
 import { BATHROOM_EXAMPLE } from "../../data/seed.js";
 import { SERVICES } from "../../data/catalog.js";
-import { BATH_DEFAULT, bathroomLines, geometry, linesToQty } from "../../lib/rooms/bathroom.js";
+import { ROOM_BY_ID, ROOM_DEFS, linesToQty } from "../../lib/rooms/index.js";
 import { contractorQuote, estimate } from "../../lib/market.js";
 import { phoneDigits } from "../../lib/messaging.js";
-import { usePersistentState } from "../../lib/storage.js";
+import { readStored, usePersistentState } from "../../lib/storage.js";
 import { sendRequest } from "../../lib/api.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
 
@@ -20,20 +20,37 @@ export default function ClientView({ contractors, loading, market, notify }) {
   const { t, fmt } = useI18n();
   // Чернови на клиента остават в браузъра, докато не изпрати запитване.
   const [mode, setMode] = usePersistentState("client.mode", "rooms"); // rooms | services
-  const [room, setRoom] = usePersistentState("client.room", "bath");
-  const [bath, setBath] = usePersistentState("client.bath", BATH_DEFAULT);
+  // Началният екран е само изборът на помещение; калкулаторът се показва след избор.
+  const [roomId, setRoomId] = useState(null);
+  const [roomCfgs, setRoomCfgs] = usePersistentState("client.rooms", () => {
+    const oldBath = readStored("client.bath", null);
+    return oldBath ? { bath: oldBath } : {};
+  });
   const [serviceQty, setServiceQty] = usePersistentState("client.qty", BATHROOM_EXAMPLE);
   const [client, setClient] = usePersistentState("client.info", EMPTY_CLIENT);
   const [comment, setComment] = usePersistentState("client.comment", "");
   const [custom, setCustom] = usePersistentState("client.custom", "");
   const [sendingTo, setSendingTo] = useState(null);
 
-  const bathCfg = useMemo(() => ({ ...BATH_DEFAULT, ...bath }), [bath]);
-  const roomQty = useMemo(() => linesToQty(bathroomLines(bathCfg)), [bathCfg]);
+  const room = roomId ? ROOM_BY_ID[roomId] : null;
+  const cfg = useMemo(() => (room ? { ...room.defaults, ...(roomCfgs[room.id] || {}) } : null), [room, roomCfgs]);
+  const setCfg = (next) => setRoomCfgs((all) => ({ ...all, [room.id]: next }));
+
+  const roomQty = useMemo(() => (room ? linesToQty(room.lines(cfg)) : {}), [room, cfg]);
+  const showCalc = mode === "services" || !!room;
   const qty = mode === "rooms" ? roomQty : serviceQty;
 
   const selected = useMemo(() => SERVICES.filter((s) => qty[s.id] > 0), [qty]);
   const est = useMemo(() => estimate(qty, market), [qty, market]);
+
+  // Карти на началния екран: типична площ и цена при стандартните настройки.
+  const summaries = useMemo(
+    () =>
+      Object.fromEntries(
+        ROOM_DEFS.map((r) => [r.id, { floor: r.geometry(r.defaults).floor, total: estimate(linesToQty(r.lines(r.defaults)), market).avg }]),
+      ),
+    [market],
+  );
 
   const ranked = useMemo(
     () =>
@@ -52,6 +69,11 @@ export default function ClientView({ contractors, loading, market, notify }) {
       return next;
     });
 
+  const pickRoom = (id) => {
+    setRoomId(id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   /** Прехвърля количествата от помещението в подробния калкулатор. */
   const editAsServices = () => {
     setServiceQty(roomQty);
@@ -60,8 +82,8 @@ export default function ClientView({ contractors, loading, market, notify }) {
   };
 
   const roomContext = () => {
-    const g = geometry(bathCfg);
-    return t("bath.requestContext", { l: fmt.num(g.l), w: fmt.num(g.w), h: fmt.num(g.h), floor: fmt.num(g.floor) });
+    const g = room.geometry(cfg);
+    return t("rooms.requestContext", { room: t(`rooms.${room.id}`), l: fmt.num(g.l), w: fmt.num(g.w), h: fmt.num(g.h), floor: fmt.num(g.floor) });
   };
 
   const submit = async (contractor) => {
@@ -72,7 +94,7 @@ export default function ClientView({ contractors, loading, market, notify }) {
     }
     setSendingTo(contractor.id);
     try {
-      const fullComment = mode === "rooms" ? [roomContext(), comment.trim()].filter(Boolean).join("\n") : comment;
+      const fullComment = mode === "rooms" && room ? [roomContext(), comment.trim()].filter(Boolean).join("\n") : comment;
       await sendRequest({
         contractorId: contractor.id,
         client,
@@ -91,12 +113,15 @@ export default function ClientView({ contractors, loading, market, notify }) {
     }
   };
 
+  const title = mode === "services" ? t("client.title") : room ? t("rooms.roomTitle", { room: t(`rooms.${room.id}.of`) }) : t("rooms.title");
+  const lead = mode === "services" ? t("client.lead") : room ? t("rooms.roomLead") : t("rooms.lead");
+
   return (
     <>
       <section className="intro">
         <span className="label">{t("client.eyebrow")}</span>
-        <h1>{t(mode === "rooms" ? "rooms.title" : "client.title")}</h1>
-        <p className="muted">{t(mode === "rooms" ? "rooms.lead" : "client.lead")}</p>
+        <h1>{title}</h1>
+        <p className="muted">{lead}</p>
       </section>
 
       <div className="seg mode-seg" role="group" aria-label={t("rooms.modeLabel")}>
@@ -111,55 +136,68 @@ export default function ClientView({ contractors, loading, market, notify }) {
         </p>
       </div>
 
-      {mode === "rooms" && <RoomPicker value={room} onChange={setRoom} />}
+      {mode === "rooms" && !room && <RoomPicker value={null} onChange={pickRoom} summaries={summaries} />}
 
-      <div className="cols">
-        {mode === "rooms" ? (
-          <BathroomConfigurator cfg={bathCfg} setCfg={setBath} market={market} />
-        ) : (
-          <Calculator qty={serviceQty} market={market} onQuantity={setQuantity} />
-        )}
-        <EstimatePanel
-          title={mode === "rooms" ? t("rooms.estimateTitle", { room: t(`rooms.${room}`) }) : undefined}
-          selected={selected}
-          qty={qty}
-          market={market}
-          est={est}
-          client={client}
-          onClient={setClient}
-          comment={comment}
-          onComment={setComment}
-          custom={custom}
-          onCustom={setCustom}
-          onExample={mode === "services" ? () => setServiceQty(BATHROOM_EXAMPLE) : undefined}
-          onClear={mode === "services" ? () => setServiceQty({}) : undefined}
-          onReset={mode === "rooms" ? () => setBath(BATH_DEFAULT) : undefined}
-          onEditServices={mode === "rooms" ? editAsServices : undefined}
-        />
-      </div>
-
-      <section id="masters" className="stack masters">
-        <div className="stack tight">
-          <span className="label">{t("client.mastersEyebrow")}</span>
-          <h2>{t("client.mastersTitle")}</h2>
+      {mode === "rooms" && room && (
+        <div className="room-bar">
+          <button type="button" className="btn btn-s back" onClick={() => setRoomId(null)}>
+            ← {t("rooms.allRooms")}
+          </button>
+          <RoomPicker value={room.id} onChange={pickRoom} compact />
         </div>
-        {loading && <div className="card empty">{t("common.loading")}</div>}
-        <div className="grid-c">
-          {ranked.map((r) => (
-            <ContractorCard
-              key={r.contractor.id}
-              {...r}
+      )}
+
+      {showCalc && (
+        <>
+          <div className="cols">
+            {mode === "rooms" ? (
+              <RoomConfigurator key={room.id} room={room} cfg={cfg} setCfg={setCfg} market={market} />
+            ) : (
+              <Calculator qty={serviceQty} market={market} onQuantity={setQuantity} />
+            )}
+            <EstimatePanel
+              title={mode === "rooms" ? t("rooms.estimateTitle", { room: t(`rooms.${room.id}`) }) : undefined}
               selected={selected}
               qty={qty}
-              estimateTotal={est.avg}
-              sending={sendingTo === r.contractor.id}
-              onSend={() => submit(r.contractor)}
+              market={market}
+              est={est}
+              client={client}
+              onClient={setClient}
+              comment={comment}
+              onComment={setComment}
+              custom={custom}
+              onCustom={setCustom}
+              onExample={mode === "services" ? () => setServiceQty(BATHROOM_EXAMPLE) : undefined}
+              onClear={mode === "services" ? () => setServiceQty({}) : undefined}
+              onReset={mode === "rooms" ? () => setCfg(room.defaults) : undefined}
+              onEditServices={mode === "rooms" ? editAsServices : undefined}
             />
-          ))}
-        </div>
-        <p className="note">{t("client.appsNote")}</p>
-      </section>
-      <MobileEstimateBar est={est} count={selected.length} />
+          </div>
+
+          <section id="masters" className="stack masters">
+            <div className="stack tight">
+              <span className="label">{t("client.mastersEyebrow")}</span>
+              <h2>{t("client.mastersTitle")}</h2>
+            </div>
+            {loading && <div className="card empty">{t("common.loading")}</div>}
+            <div className="grid-c">
+              {ranked.map((r) => (
+                <ContractorCard
+                  key={r.contractor.id}
+                  {...r}
+                  selected={selected}
+                  qty={qty}
+                  estimateTotal={est.avg}
+                  sending={sendingTo === r.contractor.id}
+                  onSend={() => submit(r.contractor)}
+                />
+              ))}
+            </div>
+            <p className="note">{t("client.appsNote")}</p>
+          </section>
+          <MobileEstimateBar est={est} count={selected.length} />
+        </>
+      )}
     </>
   );
 }
