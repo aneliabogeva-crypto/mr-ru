@@ -62,6 +62,7 @@ export default function EstimatePanel({
           <span>{t("client.comment")}</span>
           <textarea id="c-comment" className="inp" value={comment} onChange={(e) => onComment(e.target.value)} placeholder={t("client.commentPh")} />
         </label>
+        <p className="note">{t("client.privacyNote")}</p>
         <a className="btn btn-p" href="#masters">{t("client.chooseMaster")}</a>
       </div>
     </aside>

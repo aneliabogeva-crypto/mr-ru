@@ -1,6 +1,6 @@
 import { LANGUAGES, useI18n } from "../i18n/I18nProvider.jsx";
 
-export default function Header({ role, onRole, newRequests }) {
+export default function Header({ role, onRole, newRequests = 0 }) {
   const { t, lang, setLang } = useI18n();
   return (
     <header className="hdr">

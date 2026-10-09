@@ -5,7 +5,7 @@
 - **Клиент:** калкулатор по пазарни средни цени, сравнение на майстори, Viber/WhatsApp, запитвания и FAQ чатбот.
 - **Майстор:** ценоразпис с „Не се предлага“, входящи запитвания, конструктор на оферти, PDF, имейл, Viber и WhatsApp.
 
-Това е **MVP без бекенд**: данните (майстори, запитвания, ценоразписи) се пазят в `localStorage` на браузъра. Майсторите и цените в `src/data/seed.js` са примерни.
+Данните (майстори, ценоразписи, запитвания) са в **Supabase** (PostgreSQL, регион ЕС). Майсторите влизат с имейл и парола. Профилите с `is_demo = true` са примерни и служат за начални пазарни цени.
 
 ## Стартиране
 
@@ -24,6 +24,18 @@ npm run preview   # преглед на dist/
 (`.github/workflows/deploy.yml`): https://aneliabogeva-crypto.github.io/mr-ru/
 
 Еднократна настройка: Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+
+## База данни (Supabase)
+
+- **Схема и правила за достъп:** `supabase/schema.sql`. Пуска се в Supabase → SQL Editor. Може да се пусне повторно.
+- **Кой какво вижда:**
+  - всеки вижда профилите и ценоразписите на майсторите;
+  - всеки може да изпрати запитване, но не може да чете запитвания;
+  - майсторът вижда и сменя статуса само на своите запитвания и редактира само своя профил;
+  - собственикът на проекта вижда всичко в Supabase → Table Editor.
+- **Ключове:** адресът и публичният (publishable) ключ са в `src/lib/supabase.js`. Те не са тайна. Никога не слагайте `service_role` или secret ключ във фронтенда.
+- **Вход:** в Authentication → URL Configuration трябва Site URL да е адресът на сайта, иначе линковете в имейлите водят на грешно място.
+- **Демо майстори:** `delete from public.contractors where is_demo;` ги премахва.
 
 ## Структура
 
@@ -44,12 +56,16 @@ src/
     pdfFonts.js             вграден шрифт DejaVu Sans с кирилица
     messaging.js            връзки към Viber, WhatsApp, имейл; копиране
     chatbot.js              разпознаване на въпроси по ключови думи
-    storage.js              usePersistentState (localStorage)
+    supabase.js             клиент за Supabase (адрес и публичен ключ)
+    api.js                  четене и запис в базата, вход и регистрация
+    useSession.js           текуща сесия на майстора
+    storage.js              usePersistentState (localStorage, за чернови и език)
     format.js               формат на суми и дати по език
   components/               Header, Chatbot, CategoryChips, Toast
   views/
     client/                 ClientView, Calculator, EstimatePanel, ContractorCard
-    pro/                    ProView, Requests, PriceList, QuoteBuilder, Profile
+    pro/                    ProView, AuthPanel, Onboarding, Requests, PriceList, QuoteBuilder, Profile
+supabase/schema.sql         таблици, правила за достъп, демо майстори
 ```
 
 ## Как работят основните неща
@@ -68,8 +84,8 @@ src/
 
 ## Следващи стъпки (бекенд)
 
-1. API и база данни за майстори, ценоразписи, запитвания и оферти (замества `usePersistentState`).
-2. Регистрация и вход с роли Клиент / Майстор (замества избора на профил в режим „Майстор“).
+1. Собствен SMTP в Supabase (вграденият изпраща ограничен брой имейли), имейл известие до майстора при ново запитване.
+2. Администраторски екран и защита от спам при запитванията (напр. CAPTCHA).
 3. Изпращане на PDF по имейл от сървъра (SMTP или услуга като SendGrid, Postmark).
 4. Отзиви и рейтинг, филтър по локация, календар за огледи.
 5. Мобилни приложения: React Native или обвивка (Capacitor) върху същия код за Google Play и App Store.

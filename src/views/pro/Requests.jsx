@@ -2,45 +2,65 @@ import { SERVICE_BY_ID } from "../../data/catalog.js";
 import { viberChatLink, whatsappLink } from "../../lib/messaging.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
 
-export default function Requests({ list, me, onQuote }) {
+const STATUS_TONE = { new: "warn", seen: "", quoted: "ok", closed: "" };
+const STATUSES = ["new", "seen", "quoted", "closed"];
+
+export default function Requests({ list, me, onQuote, onStatus, onRefresh }) {
   const { t, tn, pick, unit, fmt } = useI18n();
 
+  const toolbar = (
+    <div className="row between">
+      <button type="button" className="btn btn-s" onClick={onRefresh}>{t("pro.refresh")}</button>
+      <button type="button" className="btn" onClick={() => onQuote(null)}>{t("pro.newQuoteNoRequest")}</button>
+    </div>
+  );
+
+  if (list === null) return <div className="card empty">{t("common.loading")}</div>;
   if (!list.length) {
     return (
-      <div className="card empty">
-        {t("pro.noRequests", { name: me.name })}
-        <div className="mt12">
-          <button type="button" className="btn btn-p" onClick={() => onQuote(null)}>{t("pro.newQuote")}</button>
-        </div>
+      <div className="stack">
+        {toolbar}
+        <div className="card empty">{t("pro.noRequests")}</div>
       </div>
     );
   }
 
   return (
     <div className="stack">
-      <div className="row end-x">
-        <button type="button" className="btn" onClick={() => onQuote(null)}>{t("pro.newQuoteNoRequest")}</button>
-      </div>
+      {toolbar}
       {list.map((r) => {
         const negotiable = r.items.filter((it) => me.prices[it.sid]?.off).length;
         const own = r.items.reduce((a, it) => {
           const p = me.prices[it.sid];
           return a + (p && !p.off ? p.price * it.qty : 0);
         }, 0);
-        const isNew = r.status === "new";
         return (
           <article key={r.id} className="card req">
             <div className="q-head">
               <div>
-                <h3>
-                  {r.client.name} {r.demo && <span className="demo">{t("common.example")}</span>}
-                </h3>
-                <div className="small muted">{fmt.date(r.date)} · {r.client.city || "—"} · {r.client.phone}</div>
+                <h3>{r.client.name}</h3>
+                <div className="small muted">
+                  {fmt.date(r.date)} · {r.client.city || "—"} · <span className="phone">{r.client.phone}</span>
+                  {r.client.email && <> · <span className="phone">{r.client.email}</span></>}
+                </div>
               </div>
-              <span className={"pill " + (isNew ? "warn" : "ok")}>{isNew ? t("pro.statusNew") : t("pro.statusSeen")}</span>
+              <label className="status-pick">
+                <span className="sr-only">{t("pro.status")}</span>
+                <select
+                  id={`st-${r.id}`}
+                  className={"inp pill " + STATUS_TONE[r.status]}
+                  value={r.status}
+                  onChange={(e) => onStatus(r, e.target.value)}
+                >
+                  {STATUSES.map((s) => <option key={s} value={s}>{t(`pro.status_${s}`)}</option>)}
+                </select>
+              </label>
             </div>
             <div className="small">
-              {r.items.map((it) => `${pick(SERVICE_BY_ID[it.sid].name)} – ${fmt.qty(it.qty)} ${unit(SERVICE_BY_ID[it.sid].unit)}`).join(" · ")}
+              {r.items
+                .filter((it) => SERVICE_BY_ID[it.sid])
+                .map((it) => `${pick(SERVICE_BY_ID[it.sid].name)} – ${fmt.qty(it.qty)} ${unit(SERVICE_BY_ID[it.sid].unit)}`)
+                .join(" · ")}
             </div>
             {r.custom && <div className="small"><strong>{t("pro.customService")}:</strong> {r.custom}</div>}
             {r.comment && <div className="small muted">„{r.comment}“</div>}

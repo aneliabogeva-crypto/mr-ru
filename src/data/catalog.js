@@ -66,5 +66,13 @@ export const SERVICES = [
 
 export const SERVICE_BY_ID = Object.fromEntries(SERVICES.map((x) => [x.id, x]));
 
+/**
+ * Начален ценоразпис за нов майстор: каталожната цена за услугите от неговите
+ * дейности, а останалите са „Не се предлага“. Майсторът ги редактира после.
+ */
+export function defaultPrices(trades) {
+  return Object.fromEntries(SERVICES.map((s) => [s.id, { price: s.base, off: !trades.includes(s.cat) }]));
+}
+
 /** Цели бройки ли са (за стъпката на полето за количество). */
 export const isCountUnit = (unit) => unit === "pc" || unit === "trip";

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Calculator from "./Calculator.jsx";
 import EstimatePanel from "./EstimatePanel.jsx";
 import ContractorCard from "./ContractorCard.jsx";
@@ -7,26 +7,29 @@ import { SERVICES } from "../../data/catalog.js";
 import { contractorQuote, estimate } from "../../lib/market.js";
 import { phoneDigits } from "../../lib/messaging.js";
 import { usePersistentState } from "../../lib/storage.js";
+import { sendRequest } from "../../lib/api.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
 
 const EMPTY_CLIENT = { name: "", phone: "", email: "", city: "" };
 
-export default function ClientView({ state, setState, market, notify }) {
+export default function ClientView({ contractors, loading, market, notify }) {
   const { t } = useI18n();
+  // Чернови на клиента остават в браузъра, докато не изпрати запитване.
   const [qty, setQty] = usePersistentState("client.qty", BATHROOM_EXAMPLE);
   const [client, setClient] = usePersistentState("client.info", EMPTY_CLIENT);
   const [comment, setComment] = usePersistentState("client.comment", "");
   const [custom, setCustom] = usePersistentState("client.custom", "");
+  const [sendingTo, setSendingTo] = useState(null);
 
   const selected = useMemo(() => SERVICES.filter((s) => qty[s.id] > 0), [qty]);
   const est = useMemo(() => estimate(qty, market), [qty, market]);
 
   const ranked = useMemo(
     () =>
-      state.contractors
+      contractors
         .map((c) => ({ contractor: c, ...contractorQuote(c, qty) }))
-        .sort((a, b) => b.offered - a.offered || a.total - b.total),
-    [state.contractors, qty],
+        .sort((a, b) => a.contractor.demo - b.contractor.demo || b.offered - a.offered || a.total - b.total),
+    [contractors, qty],
   );
 
   const setQuantity = (id, raw) =>
@@ -38,24 +41,30 @@ export default function ClientView({ state, setState, market, notify }) {
       return next;
     });
 
-  const sendRequest = (contractor) => {
+  const submit = async (contractor) => {
     if (!selected.length && !custom.trim()) return notify(t("client.errNoItems"));
-    if (!client.name.trim() || !phoneDigits(client.phone)) {
-      document.getElementById("c-name")?.focus();
+    if (!client.name.trim() || phoneDigits(client.phone).length < 6) {
+      document.getElementById(client.name.trim() ? "c-phone" : "c-name")?.focus();
       return notify(t("client.errContact"));
     }
-    const request = {
-      id: `r${Date.now()}`,
-      to: contractor.id,
-      date: new Date().toISOString(),
-      status: "new",
-      client: { ...client },
-      items: selected.map((s) => ({ sid: s.id, qty: qty[s.id] })),
-      comment,
-      custom,
-    };
-    setState((s) => ({ ...s, requests: [request, ...s.requests] }));
-    notify(t("client.sent", { name: contractor.name }));
+    setSendingTo(contractor.id);
+    try {
+      await sendRequest({
+        contractorId: contractor.id,
+        client,
+        items: selected.map((s) => ({ sid: s.id, qty: qty[s.id] })),
+        comment,
+        custom,
+      });
+      notify(t("client.sent", { name: contractor.name }));
+      setComment("");
+      setCustom("");
+    } catch (e) {
+      console.error(e);
+      notify(t("client.sendError"));
+    } finally {
+      setSendingTo(null);
+    }
   };
 
   return (
@@ -92,13 +101,11 @@ export default function ClientView({ state, setState, market, notify }) {
       </div>
 
       <section id="masters" className="stack masters">
-        <div className="row between end">
-          <div className="stack tight">
-            <span className="label">{t("client.mastersEyebrow")}</span>
-            <h2>{t("client.mastersTitle")}</h2>
-          </div>
-          <span className="demo">{t("common.sampleProfiles")}</span>
+        <div className="stack tight">
+          <span className="label">{t("client.mastersEyebrow")}</span>
+          <h2>{t("client.mastersTitle")}</h2>
         </div>
+        {loading && <div className="card empty">{t("common.loading")}</div>}
         <div className="grid-c">
           {ranked.map((r) => (
             <ContractorCard
@@ -107,7 +114,8 @@ export default function ClientView({ state, setState, market, notify }) {
               selected={selected}
               qty={qty}
               estimateTotal={est.avg}
-              onSend={() => sendRequest(r.contractor)}
+              sending={sendingTo === r.contractor.id}
+              onSend={() => submit(r.contractor)}
             />
           ))}
         </div>

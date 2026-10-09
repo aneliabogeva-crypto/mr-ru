@@ -3,7 +3,7 @@ import { initials } from "../../lib/format.js";
 import { viberChatLink, whatsappLink } from "../../lib/messaging.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
 
-export default function ContractorCard({ contractor: c, total, offered, negotiable, selected, qty, estimateTotal, onSend }) {
+export default function ContractorCard({ contractor: c, total, offered, negotiable, selected, qty, estimateTotal, onSend, sending }) {
   const { t, pick, unit, fmt } = useI18n();
   const catName = (id) => pick(CATEGORIES.find((x) => x.id === id)?.name);
 
@@ -19,7 +19,9 @@ export default function ContractorCard({ contractor: c, total, offered, negotiab
       <div className="ctr-top">
         <div className="ava" aria-hidden="true">{initials(c.name)}</div>
         <div className="min0">
-          <h3>{c.name}</h3>
+          <h3>
+            {c.name} {c.demo && <span className="demo">{t("common.demo")}</span>}
+          </h3>
           <div className="small muted">{c.person} · {c.city}</div>
         </div>
       </div>
@@ -48,7 +50,9 @@ export default function ContractorCard({ contractor: c, total, offered, negotiab
       <div className="row">
         <a className="btn btn-s btn-viber" href={viberChatLink(c.phone)}>Viber</a>
         <a className="btn btn-s btn-wa" href={whatsappLink(c.phone, waText)} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-        <button type="button" className="btn btn-s btn-p push-right" onClick={onSend}>{t("client.sendRequest")}</button>
+        <button type="button" className="btn btn-s btn-p push-right" onClick={onSend} disabled={sending}>
+          {sending ? t("client.sending") : t("client.sendRequest")}
+        </button>
       </div>
     </article>
   );

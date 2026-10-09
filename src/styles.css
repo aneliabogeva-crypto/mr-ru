@@ -182,3 +182,16 @@ tr.off td{color:var(--muted)}
 .add-row{border-top:1px solid var(--line)}
 .add-row select{min-width:200px}
 .sw input.teal{accent-color:var(--teal)}
+
+/* вход, грешки, статуси */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.disc.error{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.disc.error .mark{background:var(--warn);color:var(--surface)}
+.form-error{color:var(--warn);font-size:14px;font-weight:500}
+.form-info{color:var(--ok);font-size:14px;font-weight:500}
+.save-state{min-width:7em;text-align:right}
+.save-state.saved{color:var(--ok)}
+.save-state.error{color:var(--warn)}
+.status-pick select{width:auto;padding:4px 28px 4px 10px;font-size:12.5px;font-weight:600;border-radius:999px;cursor:pointer}
+.status-pick select.warn{background-color:var(--warn-soft);color:var(--warn);border-color:transparent}
+.status-pick select.ok{background-color:var(--ok-soft);color:var(--ok);border-color:transparent}
