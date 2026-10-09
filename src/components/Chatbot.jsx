@@ -14,6 +14,13 @@ export default function Chatbot({ market }) {
     if (body.current) body.current.scrollTop = body.current.scrollHeight;
   }, [messages, open]);
 
+  // Лентата с оценката на телефона отваря чата със събитие.
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener("mrru:open-chat", onOpen);
+    return () => window.removeEventListener("mrru:open-chat", onOpen);
+  }, []);
+
   const reply = (text) => {
     const r = answer(text, lang);
     if (r?.type === "price") {

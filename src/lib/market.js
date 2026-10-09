@@ -1,30 +1,43 @@
 import { SERVICES, priceOf } from "../data/catalog.js";
-import { quantile } from "../data/marketReference.js";
+import { REFERENCE_POINTS, quantile } from "../data/marketReference.js";
+
+/** Референтната (софийска) цена тежи колкото толкова майстори. */
+export const REFERENCE_WEIGHT = 3;
+
+/** В пазарната цена влизат истински майстори от София (без демо профилите). */
+export const countsForMarket = (c) => !c.demo && (!c.city || /соф|sof/i.test(c.city));
 
 /**
- * Пазарна цена по услуга.
+ * Пазарна цена по услуга за София.
  *
- * Вземат се цените на всички майстори, които предлагат услугата, плюс
- * референтната цена от проучването (тя пази оценката, докато майсторите са
- * малко). Пазарната цена е МЕДИАНАТА им: средната по ред стойност, а не
- * средно аритметично, затова една много ниска или висока цена не я мести.
- * Типичният диапазон е от 25-ия до 75-ия перцентил (без крайностите).
+ * Вземат се цените на истинските майстори от София, които предлагат
+ * услугата, и референтната цена от проучването, преброена REFERENCE_WEIGHT
+ * пъти. Така няколко профила с ниски или стари цени не могат да свалят
+ * оценката, а при много майстори решават техните цени.
+ * Пазарната цена е МЕДИАНАТА: средната по ред стойност, а не средно
+ * аритметично. Типичният диапазон е от 25-ия до 75-ия перцентил на
+ * публикуваните цени и цените на майсторите (без крайностите).
  *
  * Връща { avg, min, max, n }: avg = медиана, min/max = типичен диапазон,
  * n = брой майстори с цена.
  */
 export function computeMarket(contractors) {
+  const counted = contractors.filter(countsForMarket);
   const market = {};
   for (const svc of SERVICES) {
-    const offered = contractors
+    const offered = counted
       .map((c) => priceOf(c, svc.id))
       .filter((p) => !p.off && p.price > 0)
       .map((p) => Number(p.price));
-    const values = [...offered, svc.base];
+    const weighted = [...offered, ...Array(REFERENCE_WEIGHT).fill(svc.base)];
+    const points = (REFERENCE_POINTS[svc.id] || []).map((x) => x.value);
+    const ref = points.length ? points : [svc.base];
+    const spread = [...offered, ...Array(REFERENCE_WEIGHT).fill(ref).flat()];
+    const avg = quantile(weighted, 0.5);
     market[svc.id] = {
-      avg: quantile(values, 0.5),
-      min: quantile(values, 0.25),
-      max: quantile(values, 0.75),
+      avg,
+      min: Math.min(avg, quantile(spread, 0.25)),
+      max: Math.max(avg, quantile(spread, 0.75)),
       n: offered.length,
     };
   }

@@ -1,4 +1,4 @@
-// Каталог на услугите. `base` е референтната пазарна цена за труд в евро
+// Каталог на услугите. `base` е референтната пазарна цена за труд в София, в евро
 // (медиана на обявени цени, виж marketReference.js). Тя участва в пазарната
 // цена заедно с ценоразписите на майсторите и е начална цена за нов майстор.
 import { referencePrice } from "./marketReference.js";
@@ -24,7 +24,7 @@ export const UNITS = {
 
 const s = (id, cat, unit, bg, en) => {
   const ref = referencePrice(id);
-  return { id, cat, unit, base: ref.price, estimated: ref.estimated, name: { bg, en } };
+  return { id, cat, unit, base: ref.price, estimated: ref.estimated, national: ref.national, name: { bg, en } };
 };
 
 export const SERVICES = [
@@ -48,6 +48,7 @@ export const SERVICES = [
   s("v11", "vik", "pc", "Монтаж на смесител за душ или вана", "Install shower or bath mixer"),
   s("v12", "vik", "set", "Демонтаж на стара санитария (с извозване)", "Remove old sanitary ware (with disposal)"),
   s("v13", "vik", "pc", "Монтаж на огледало или аксесоар", "Install mirror or accessory"),
+  s("v14", "vik", "pc", "Монтаж на вграден (скрит) смесител за душ", "Install concealed shower mixer"),
   s("p1", "pl", "m2", "Гипсова мазилка", "Gypsum plaster"),
   s("p2", "pl", "m2", "Шпакловка (2 слоя)", "Skim coat (2 layers)"),
   s("p3", "pl", "m2", "Преградна стена от гипсокартон", "Drywall partition"),
@@ -57,6 +58,7 @@ export const SERVICES = [
   s("p7", "pl", "m2", "Хидроизолация", "Waterproofing"),
   s("p8", "pl", "m2", "Окачен таван от PVC пана", "PVC panel ceiling"),
   s("p9", "pl", "m2", "Изправяне на стени с мазилка под плочки", "Wall levelling plaster before tiling"),
+  s("p10", "pl", "m2", "Окачен таван в баня (влагоустойчив гипсокартон, шпакловка и боя)", "Bathroom suspended ceiling (moisture-resistant, finished)"),
   s("t1", "tf", "m2", "Лепене на подови плочки", "Floor tiling"),
   s("t2", "tf", "m2", "Лепене на стенни плочки", "Wall tiling"),
   s("t3", "tf", "m2", "Полагане на ламинат", "Laminate flooring"),
@@ -65,6 +67,8 @@ export const SERVICES = [
   s("t6", "tf", "m2", "Фугиране", "Grouting"),
   s("t7", "tf", "m2", "Циментова замазка до 5 см", "Cement screed up to 5 cm"),
   s("t8", "tf", "m2", "Надценка за плочки голям формат (над 60×60)", "Large-format tile surcharge (over 60×60)"),
+  s("t9", "tf", "m2", "Лепене на подови плочки в баня (с наклон)", "Bathroom floor tiling (with slope)"),
+  s("t10", "tf", "m2", "Лепене на стенни плочки в баня", "Bathroom wall tiling"),
   s("a1", "pa", "m2", "Грундиране", "Priming"),
   s("a2", "pa", "m2", "Боядисване с латекс (2 ръце)", "Latex paint (2 coats)"),
   s("a3", "pa", "m2", "Декоративна мазилка", "Decorative plaster"),

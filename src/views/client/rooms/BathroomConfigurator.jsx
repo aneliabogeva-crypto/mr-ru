@@ -128,6 +128,9 @@ export default function BathroomConfigurator({ cfg, setCfg, market }) {
         <Choice name="toilet" columns={3} value={cfg.toilet} onChange={(v) => set({ toilet: v })} options={labelled(optItem("toilet", "none", ["none", "floor", "wall"]), "bath.toilet")} />
         <h4 className="sub-h">{t("bath.bathTitle")}</h4>
         <Choice name="bath" value={cfg.bath} onChange={(v) => set({ bath: v })} options={labelled(optItem("bath", "none", ["none", "shower", "bathtub", "bathtub_screen"]), "bath.bath")} />
+        {cfg.bath === "shower" && (
+          <Toggle id="bath-cm" checked={cfg.concealedMixer} onChange={(v) => set({ concealedMixer: v })} label={t("bath.concealedMixer")} hint={t("bath.concealedMixerHint")} delta={delta("concealedMixer")} />
+        )}
         <div className="subopts">
           <Toggle id="bath-sink" checked={cfg.sink} onChange={(v) => set({ sink: v })} label={t("bath.sink")} delta={delta("sink")} />
           <Toggle id="bath-boiler" checked={cfg.boiler} onChange={(v) => set({ boiler: v })} label={t("bath.boiler")} delta={delta("boiler")} />

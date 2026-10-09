@@ -1,5 +1,5 @@
 // Модел „Баня“: от размерите и избраните опции изчислява количествата
-// по услуги от каталога. Използва се като шаблон за другите помещения.
+// по услуги от каталога (с отделните цени за баня: плочки t9/t10, таван p10). Използва се като шаблон за другите помещения.
 
 /** Стандартна врата 80 × 200 см. */
 export const DOOR = { w: 0.8, h: 2.0 };
@@ -28,6 +28,7 @@ export const BATH_DEFAULT = {
   toilet: "wall", // none | floor | wall
   sink: true,
   bath: "shower", // none | shower | bathtub | bathtub_screen
+  concealedMixer: false,
   boiler: true,
   washer: true,
   accessories: 3,
@@ -83,10 +84,7 @@ export function bathroomLines(cfg) {
     add("ceiling", "a1", g.ceiling);
     add("ceiling", "a5", g.ceiling);
   } else if (cfg.ceiling === "drywall") {
-    add("ceiling", "p4", g.ceiling);
-    add("ceiling", "p2", g.ceiling);
-    add("ceiling", "a1", g.ceiling);
-    add("ceiling", "a5", g.ceiling);
+    add("ceiling", "p10", g.ceiling);
   } else if (cfg.ceiling === "pvc") {
     add("ceiling", "p8", g.ceiling);
   }
@@ -97,7 +95,7 @@ export function bathroomLines(cfg) {
   if (tiledWalls > 0) {
     if (cfg.wallLevel) add("walls", "p9", tiledWalls);
     if (cfg.wetZone && cfg.bath !== "none") add("walls", "p7", cfg.bath === "shower" ? WET_ZONE.shower : WET_ZONE.bathtub);
-    add("walls", "t2", tiledWalls);
+    add("walls", "t10", tiledWalls);
     if (cfg.largeTiles) add("walls", "t8", tiledWalls);
   }
   if (paintedWalls > 0) {
@@ -110,7 +108,7 @@ export function bathroomLines(cfg) {
   if (cfg.floor === "tiles") {
     if (cfg.floorScreed) add("floor", "t7", g.floor);
     if (cfg.floorWaterproof) add("floor", "p7", g.floor + g.perimeter * WATERPROOF_UPSTAND);
-    add("floor", "t1", g.floor);
+    add("floor", "t9", g.floor);
     if (cfg.largeTiles) add("floor", "t8", g.floor);
   }
 
@@ -128,7 +126,7 @@ export function bathroomLines(cfg) {
   }
   if (cfg.bath === "bathtub" || cfg.bath === "bathtub_screen") add("plumbing", "v9", 1);
   if (cfg.bath === "bathtub_screen") add("plumbing", "v10", 1);
-  if (cfg.bath !== "none") add("plumbing", "v11", 1);
+  if (cfg.bath !== "none") add("plumbing", cfg.bath === "shower" && cfg.concealedMixer ? "v14" : "v11", 1);
   if (cfg.boiler) add("plumbing", "v5", 1);
   add("plumbing", "v13", Number(cfg.accessories) || 0);
 
