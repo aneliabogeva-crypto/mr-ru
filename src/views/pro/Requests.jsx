@@ -69,10 +69,10 @@ export default function Requests({ list, me, onQuote, onStatus, onRefresh }) {
                 {t("pro.byYourPrices")}: <strong>{fmt.eur(own)}</strong>
                 {negotiable > 0 && <> · <span className="pill neg">{tn("pro.negotiableCount", negotiable)}</span></>}
               </div>
-              <div className="row">
+              <div className="actions">
                 <a className="btn btn-s btn-viber" href={viberChatLink(r.client.phone)}>Viber</a>
                 <a className="btn btn-s btn-wa" href={whatsappLink(r.client.phone)} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-                <button type="button" className="btn btn-s btn-p" onClick={() => onQuote(r)}>{t("pro.makeQuote")}</button>
+                <button type="button" className="btn btn-s btn-p primary" onClick={() => onQuote(r)}>{t("pro.makeQuote")}</button>
               </div>
             </div>
           </article>

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import Calculator from "./Calculator.jsx";
 import EstimatePanel from "./EstimatePanel.jsx";
 import ContractorCard from "./ContractorCard.jsx";
+import MobileEstimateBar from "./MobileEstimateBar.jsx";
 import { BATHROOM_EXAMPLE } from "../../data/seed.js";
 import { SERVICES } from "../../data/catalog.js";
 import { contractorQuote, estimate } from "../../lib/market.js";
@@ -121,6 +122,7 @@ export default function ClientView({ contractors, loading, market, notify }) {
         </div>
         <p className="note">{t("client.appsNote")}</p>
       </section>
+      <MobileEstimateBar est={est} count={selected.length} />
     </>
   );
 }

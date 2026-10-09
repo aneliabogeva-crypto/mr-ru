@@ -208,4 +208,11 @@ export default {
   "onboard.errName": "Enter a company or contractor name.",
   "onboard.errPhone": "Enter a contact phone.",
   "onboard.errTrades": "Choose at least one trade.",
+
+  // мобилен изглед
+  "client.selectedCount_one": "{n} selected",
+  "client.selectedCount_other": "{n} selected",
+  "client.toRequest": "Request a quote",
+  "client.decrease": "Decrease: {name}",
+  "client.increase": "Increase: {name}",
 };

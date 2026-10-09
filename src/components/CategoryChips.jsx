@@ -5,7 +5,7 @@ import { useI18n } from "../i18n/I18nProvider.jsx";
 export default function CategoryChips({ value, onChange, counts }) {
   const { t, pick } = useI18n();
   return (
-    <div className="chips" role="group" aria-label={t("common.categories")}>
+    <div className="chips cat-chips" role="group" aria-label={t("common.categories")}>
       <button type="button" className="chip" aria-pressed={value === "all"} onClick={() => onChange("all")}>
         {t("common.all")}
       </button>

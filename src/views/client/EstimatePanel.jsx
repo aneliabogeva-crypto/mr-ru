@@ -7,7 +7,7 @@ export default function EstimatePanel({
   const field = (key) => (e) => onClient({ ...client, [key]: e.target.value });
 
   return (
-    <aside className="rail stack">
+    <aside className="rail stack" id="estimate">
       <div className="card pad stack">
         <div className="row between">
           <span className="label">{t("client.yourEstimate")}</span>

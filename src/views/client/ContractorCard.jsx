@@ -47,10 +47,10 @@ export default function ContractorCard({ contractor: c, total, offered, negotiab
       )}
 
       <div className="phone muted">{c.phone}</div>
-      <div className="row">
+      <div className="actions">
         <a className="btn btn-s btn-viber" href={viberChatLink(c.phone)}>Viber</a>
         <a className="btn btn-s btn-wa" href={whatsappLink(c.phone, waText)} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-        <button type="button" className="btn btn-s btn-p push-right" onClick={onSend} disabled={sending}>
+        <button type="button" className="btn btn-s btn-p primary" onClick={onSend} disabled={sending}>
           {sending ? t("client.sending") : t("client.sendRequest")}
         </button>
       </div>

@@ -75,7 +75,7 @@ export default function QuoteBuilder({ quote: q, setQuote, me, notify }) {
         </div>
 
         <div className="card tbl-wrap">
-          <table>
+          <table className="tbl-cards quote-tbl">
             <thead>
               <tr>
                 <th>{t("quote.colItem")}</th>
@@ -89,16 +89,16 @@ export default function QuoteBuilder({ quote: q, setQuote, me, notify }) {
             <tbody>
               {q.lines.map((l) => (
                 <tr key={l.key}>
-                  <td className="w-name">
+                  <td className="w-name c-name" data-label={t("pdf.description")}>
                     <input id={`ln-${l.key}`} className="inp" aria-label={t("pdf.description")} value={l.name} onChange={(e) => updateLine(l.key, { name: e.target.value })} />
                   </td>
-                  <td>
+                  <td className="c-unit" data-label={t("pro.colUnit")}>
                     <input id={`lu-${l.key}`} className="inp w-unit" aria-label={t("pro.colUnit")} value={unit(l.unit)} onChange={(e) => updateLine(l.key, { unit: e.target.value })} />
                   </td>
-                  <td className="num">
+                  <td className="num c-qty" data-label={t("pdf.qty")}>
                     <input id={`lq-${l.key}`} className="inp w-qty" type="number" min="0" step="0.5" aria-label={t("pdf.qty")} value={l.qty} onChange={(e) => updateLine(l.key, { qty: e.target.value })} />
                   </td>
-                  <td className="num">
+                  <td className="num c-price" data-label={t("quote.colUnitPrice")}>
                     <input
                       id={`lp-${l.key}`}
                       className="inp w-price"
@@ -111,10 +111,10 @@ export default function QuoteBuilder({ quote: q, setQuote, me, notify }) {
                       onChange={(e) => updateLine(l.key, { price: e.target.value === "" ? null : e.target.value })}
                     />
                   </td>
-                  <td className="num nowrap">
+                  <td className="num nowrap c-sum">
                     {isNegotiable(l) ? <span className="pill neg">{t("common.negotiable")}</span> : fmt.eur((Number(l.price) || 0) * (Number(l.qty) || 0))}
                   </td>
-                  <td>
+                  <td className="c-del">
                     <button type="button" className="btn btn-s" aria-label={t("quote.remove", { name: l.name })} onClick={() => removeLine(l.key)}>✕</button>
                   </td>
                 </tr>

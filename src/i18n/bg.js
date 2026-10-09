@@ -208,4 +208,11 @@ export default {
   "onboard.errName": "Въведете име на фирмата или майстора.",
   "onboard.errPhone": "Въведете телефон за връзка.",
   "onboard.errTrades": "Изберете поне една дейност.",
+
+  // мобилен изглед
+  "client.selectedCount_one": "{n} избрана",
+  "client.selectedCount_other": "{n} избрани",
+  "client.toRequest": "Към запитването",
+  "client.decrease": "Намали: {name}",
+  "client.increase": "Увеличи: {name}",
 };

@@ -33,8 +33,21 @@ export default function Chatbot({ market }) {
 
   return (
     <>
-      <button type="button" className="btn btn-p fab" aria-expanded={open} onClick={() => setOpen(!open)}>
-        {open ? t("chat.close") : t("chat.open")}
+      <button
+        type="button"
+        className={"btn btn-p fab" + (open ? " is-open" : "")}
+        aria-expanded={open}
+        aria-label={open ? t("chat.close") : t("chat.open")}
+        onClick={() => setOpen(!open)}
+      >
+        <svg className="fab-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          {open ? (
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+          ) : (
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4h0A1.5 1.5 0 0 1 4 14.5z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+          )}
+        </svg>
+        <span className="fab-label">{open ? t("chat.close") : t("chat.open")}</span>
       </button>
       {open && (
         <section className="card chat" aria-label={t("chat.title")}>

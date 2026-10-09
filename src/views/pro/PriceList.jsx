@@ -19,7 +19,7 @@ export default function PriceList({ me, updateMe, market }) {
         <span className="small muted">{t("pro.offeredCount", { a: offered, b: SERVICES.length })}</span>
       </div>
       <div className="card tbl-wrap">
-        <table>
+        <table className="tbl-cards price-tbl">
           <thead>
             <tr>
               <th>{t("pro.colService")}</th>
@@ -38,12 +38,12 @@ export default function PriceList({ me, updateMe, market }) {
               const tone = diff === null ? "" : diff > 10 ? "warn" : diff < -10 ? "ok" : "";
               return (
                 <tr key={s.id} className={p.off ? "off" : ""}>
-                  <td className="w-name">
+                  <td className="w-name c-name">
                     {pick(s.name)}
                     <div className="small muted">{catName(s.cat)}</div>
                   </td>
-                  <td>{unit(s.unit)}</td>
-                  <td className="num">
+                  <td className="c-unit">{unit(s.unit)}</td>
+                  <td className="num c-price" data-label={`${t("pro.colYourPrice")} / ${unit(s.unit)}`}>
                     {p.off ? (
                       <span className="pill neg">{t("common.negotiable")}</span>
                     ) : (
@@ -60,14 +60,14 @@ export default function PriceList({ me, updateMe, market }) {
                       />
                     )}
                   </td>
-                  <td>
+                  <td className="c-off">
                     <label className="sw">
                       <input id={`o-${s.id}`} type="checkbox" checked={p.off} onChange={(e) => setPrice(s.id, { off: e.target.checked })} />
                       {t("pro.notOffered")}
                     </label>
                   </td>
-                  <td className="num">{fmt.eur(m.avg)}</td>
-                  <td className="num">
+                  <td className="num c-market" data-label={t("pro.colMarket")}>{fmt.eur(m.avg)}</td>
+                  <td className="num c-diff">
                     {diff === null ? "—" : <span className={"pill " + tone}>{diff > 0 ? "+" : ""}{fmt.pct(diff)}</span>}
                   </td>
                 </tr>
