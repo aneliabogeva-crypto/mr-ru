@@ -1,4 +1,5 @@
-// Демо майсторите вече са в базата (supabase/schema.sql, is_demo = true).
+// Демо майсторите са в базата (supabase/schema.sql, is_demo = true).
+import { BATH_DEFAULT, bathroomLines, linesToQty } from "../lib/rooms/bathroom.js";
 
-/** Примерни количества за ремонт на баня ~5 м², показват се при първо отваряне. */
-export const BATHROOM_EXAMPLE = { d1: 24, d4: 1, v2: 1, v4: 2, v6: 1, t1: 5, t2: 19, t6: 24, el2: 2, el4: 2 };
+/** Примерни количества за баня 2,5 × 2 м – същите като в конфигуратора „Баня“. */
+export const BATHROOM_EXAMPLE = linesToQty(bathroomLines(BATH_DEFAULT));

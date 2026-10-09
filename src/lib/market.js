@@ -1,30 +1,37 @@
-import { SERVICES } from "../data/catalog.js";
+import { SERVICES, priceOf } from "../data/catalog.js";
+import { quantile } from "../data/marketReference.js";
 
 /**
- * Пазарна статистика по услуга от ценоразписите на майсторите.
- * Взимат се само майсторите, които предлагат услугата с цена > 0.
- * Ако никой не я предлага, връща базовата цена от каталога и n = 0.
+ * Пазарна цена по услуга.
+ *
+ * Вземат се цените на всички майстори, които предлагат услугата, плюс
+ * референтната цена от проучването (тя пази оценката, докато майсторите са
+ * малко). Пазарната цена е МЕДИАНАТА им: средната по ред стойност, а не
+ * средно аритметично, затова една много ниска или висока цена не я мести.
+ * Типичният диапазон е от 25-ия до 75-ия перцентил (без крайностите).
+ *
+ * Връща { avg, min, max, n }: avg = медиана, min/max = типичен диапазон,
+ * n = брой майстори с цена.
  */
 export function computeMarket(contractors) {
   const market = {};
   for (const svc of SERVICES) {
-    const prices = contractors
-      .map((c) => c.prices[svc.id])
-      .filter((p) => p && !p.off && p.price > 0)
-      .map((p) => p.price);
-    market[svc.id] = prices.length
-      ? {
-          avg: prices.reduce((a, b) => a + b, 0) / prices.length,
-          min: Math.min(...prices),
-          max: Math.max(...prices),
-          n: prices.length,
-        }
-      : { avg: svc.base, min: svc.base, max: svc.base, n: 0 };
+    const offered = contractors
+      .map((c) => priceOf(c, svc.id))
+      .filter((p) => !p.off && p.price > 0)
+      .map((p) => Number(p.price));
+    const values = [...offered, svc.base];
+    market[svc.id] = {
+      avg: quantile(values, 0.5),
+      min: quantile(values, 0.25),
+      max: quantile(values, 0.75),
+      n: offered.length,
+    };
   }
   return market;
 }
 
-/** Оценка за избраните количества: средна, минимална и максимална сума. */
+/** Оценка за избраните количества: пазарна сума и типичен диапазон. */
 export function estimate(qty, market) {
   return Object.entries(qty).reduce(
     (acc, [sid, q]) => {
@@ -43,8 +50,8 @@ export function contractorQuote(contractor, qty) {
   const negotiable = [];
   for (const [sid, q] of Object.entries(qty)) {
     if (!(q > 0)) continue;
-    const p = contractor.prices[sid];
-    if (!p || p.off) negotiable.push(sid);
+    const p = priceOf(contractor, sid);
+    if (p.off) negotiable.push(sid);
     else {
       offered += 1;
       total += p.price * q;

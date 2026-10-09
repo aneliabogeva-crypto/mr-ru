@@ -1,4 +1,4 @@
-import { SERVICE_BY_ID } from "../../data/catalog.js";
+import { SERVICE_BY_ID, priceOf } from "../../data/catalog.js";
 import { viberChatLink, whatsappLink } from "../../lib/messaging.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
 
@@ -29,10 +29,10 @@ export default function Requests({ list, me, onQuote, onStatus, onRefresh }) {
     <div className="stack">
       {toolbar}
       {list.map((r) => {
-        const negotiable = r.items.filter((it) => me.prices[it.sid]?.off).length;
+        const negotiable = r.items.filter((it) => priceOf(me, it.sid).off).length;
         const own = r.items.reduce((a, it) => {
-          const p = me.prices[it.sid];
-          return a + (p && !p.off ? p.price * it.qty : 0);
+          const p = priceOf(me, it.sid);
+          return a + (!p.off ? p.price * it.qty : 0);
         }, 0);
         return (
           <article key={r.id} className="card req">

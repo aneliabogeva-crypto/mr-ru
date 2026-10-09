@@ -1,4 +1,4 @@
-import { SERVICE_BY_ID } from "../data/catalog.js";
+import { SERVICE_BY_ID, priceOf } from "../data/catalog.js";
 
 export const VAT_RATE = 0.2;
 
@@ -11,7 +11,7 @@ export function createQuote({ no, contractor, request, lang, defaultNotes }) {
   const lines = request
     ? request.items.map((it, i) => {
         const svc = SERVICE_BY_ID[it.sid];
-        const p = contractor.prices[it.sid];
+        const p = priceOf(contractor, it.sid);
         return {
           key: `l${i}`,
           name: svc.name[lang] || svc.name.bg,

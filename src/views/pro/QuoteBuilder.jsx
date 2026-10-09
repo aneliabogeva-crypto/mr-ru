@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CATEGORIES, SERVICES, SERVICE_BY_ID } from "../../data/catalog.js";
+import { CATEGORIES, SERVICES, SERVICE_BY_ID, priceOf } from "../../data/catalog.js";
 import { isNegotiable, quoteSummary, quoteTotals, validUntil } from "../../lib/quote.js";
 import { copyToClipboard, mailtoLink, viberForwardLink, whatsappLink } from "../../lib/messaging.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
@@ -22,7 +22,7 @@ export default function QuoteBuilder({ quote: q, setQuote, me, notify }) {
       setQuote({ ...q, lines: [...q.lines, { key, name: t("quote.newLine"), unit: "pc", qty: 1, price: 0 }] });
     } else if (SERVICE_BY_ID[sid]) {
       const s = SERVICE_BY_ID[sid];
-      const p = me.prices[sid];
+      const p = priceOf(me, sid);
       setQuote({ ...q, lines: [...q.lines, { key, name: pick(s.name), unit: s.unit, qty: 1, price: p.off ? null : p.price }] });
     }
   };
@@ -132,7 +132,7 @@ export default function QuoteBuilder({ quote: q, setQuote, me, notify }) {
                   {SERVICES.filter((s) => s.cat === c.id).map((s) => (
                     <option key={s.id} value={s.id}>
                       {pick(s.name)}
-                      {me.prices[s.id].off ? ` (${t("quote.negotiableLower")})` : ` – ${fmt.eur(me.prices[s.id].price)}/${unit(s.unit)}`}
+                      {priceOf(me, s.id).off ? ` (${t("quote.negotiableLower")})` : ` – ${fmt.eur(priceOf(me, s.id).price)}/${unit(s.unit)}`}
                     </option>
                   ))}
                 </optgroup>

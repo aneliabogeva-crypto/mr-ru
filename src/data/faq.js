@@ -7,8 +7,10 @@ export const FAQ = [
     keys: ["изчисл", "пресмят", "средн", "пазар", "calculat", "average", "market"],
     q: { bg: "Как се изчислява цената?", en: "How is the price calculated?" },
     a: {
-      bg: "Оценката е сбор от количествата, умножени по средната пазарна цена за всяка услуга. Средната цена се изчислява от ценоразписите на всички майстори, които предлагат услугата, и се обновява при всяка промяна. Показваме и диапазон от най-ниската до най-високата цена.",
-      en: "The estimate multiplies each quantity by the average market price of the service. The average comes from the price lists of all contractors who offer the service and updates whenever they change. We also show the range from the lowest to the highest price.",
+      bg: "Оценката е сбор от количествата, умножени по пазарната цена на всяка услуга. Пазарната цена е медианата: подреждаме обявените цени от ценоразписи на фирми и майстори в Mr.Ru и взимаме средната по ред, а не средно аритметично. Така една много ниска или много висока цена не изкривява оценката. Показваме и типичен диапазон без крайностите.",
+
+      en: "The estimate multiplies each quantity by the market price of the service. The market price is the median: we sort the published prices from company price lists and Mr.Ru contractors and take the middle one, not the arithmetic average, so a single very low or very high price doesn't skew it. We also show a typical range without the extremes.",
+
     },
   },
   {

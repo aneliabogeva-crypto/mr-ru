@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CATEGORIES, SERVICES } from "../../data/catalog.js";
+import { CATEGORIES, SERVICES, priceOf } from "../../data/catalog.js";
 import CategoryChips from "../../components/CategoryChips.jsx";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
 
@@ -7,8 +7,8 @@ export default function PriceList({ me, updateMe, market }) {
   const { t, pick, unit, fmt } = useI18n();
   const [cat, setCat] = useState("all");
   const setPrice = (sid, patch) =>
-    updateMe((c) => ({ ...c, prices: { ...c.prices, [sid]: { ...c.prices[sid], ...patch } } }));
-  const offered = SERVICES.filter((s) => !me.prices[s.id].off).length;
+    updateMe((c) => ({ ...c, prices: { ...c.prices, [sid]: { ...priceOf(c, sid), ...patch } } }));
+  const offered = SERVICES.filter((s) => !priceOf(me, s.id).off).length;
   const catName = (id) => pick(CATEGORIES.find((c) => c.id === id)?.name);
 
   return (
@@ -32,9 +32,9 @@ export default function PriceList({ me, updateMe, market }) {
           </thead>
           <tbody>
             {SERVICES.filter((s) => cat === "all" || s.cat === cat).map((s) => {
-              const p = me.prices[s.id];
+              const p = priceOf(me, s.id);
               const m = market[s.id];
-              const diff = p.off || !m.n ? null : ((p.price - m.avg) / m.avg) * 100;
+              const diff = p.off ? null : ((p.price - m.avg) / m.avg) * 100;
               const tone = diff === null ? "" : diff > 10 ? "warn" : diff < -10 ? "ok" : "";
               return (
                 <tr key={s.id} className={p.off ? "off" : ""}>
