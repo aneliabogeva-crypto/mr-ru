@@ -1,7 +1,7 @@
 import { useI18n } from "../../i18n/I18nProvider.jsx";
 
 export default function EstimatePanel({
-  title, selected, qty, market, est, client, onClient, comment, onComment, custom, onCustom, onExample, onClear, onReset, onEditServices,
+  title, selected, qty, market, est, client, onClient, comment, onComment, custom, onCustom, onClear,
 }) {
   const { t, pick, unit, fmt } = useI18n();
   const field = (key) => (e) => onClient({ ...client, [key]: e.target.value });
@@ -12,9 +12,7 @@ export default function EstimatePanel({
         <div className="row between">
           <span className="label">{title || t("client.yourEstimate")}</span>
           <span className="row gap12">
-            {onExample && <button type="button" className="btn-link" onClick={onExample}>{t("client.exampleBath")}</button>}
             {onClear && <button type="button" className="btn-link" onClick={onClear}>{t("client.clear")}</button>}
-            {onReset && <button type="button" className="btn-link" onClick={onReset}>{t("rooms.reset")}</button>}
           </span>
         </div>
         <div>
@@ -34,9 +32,6 @@ export default function EstimatePanel({
               </div>
             ))}
           </div>
-        )}
-        {onEditServices && selected.length > 0 && (
-          <button type="button" className="btn btn-s" onClick={onEditServices}>{t("rooms.editServices")}</button>
         )}
         <hr />
         <span className="label">{t("client.requestDetails")}</span>

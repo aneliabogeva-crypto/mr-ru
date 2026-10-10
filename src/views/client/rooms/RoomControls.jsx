@@ -74,7 +74,7 @@ export function Section({ id, title, total, children, note }) {
     <section className="card room-sec" aria-labelledby={`sec-${id}`}>
       <header className="room-sec-h">
         <h3 id={`sec-${id}`}>{title}</h3>
-        <span className={"room-sec-total" + (total > 0.5 ? "" : " zero")}>{total > 0.5 ? fmt.eur0(total) : "—"}</span>
+        {total !== undefined && <span className={"room-sec-total" + (total > 0.5 ? "" : " zero")}>{total > 0.5 ? fmt.eur0(total) : "—"}</span>}
       </header>
       <div className="room-sec-b">{children}</div>
       {note && <p className="note">{note}</p>}

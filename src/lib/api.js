@@ -56,8 +56,26 @@ const unwrap = ({ data, error }) => {
 
 // ─── Майстори ──────────────────────────────────────────────────────────────
 export async function listContractors() {
-  const rows = unwrap(await withColumns((cols) => supabase.from("contractors").select(cols).order("is_demo").order("created_at")));
-  return rows.map(toContractor);
+  const [res, ratings] = await Promise.all([
+    withColumns((cols) => supabase.from("contractors").select(cols).order("is_demo").order("created_at")),
+    listRatings(),
+  ]);
+  return unwrap(res).map((r) => ({ ...toContractor(r), ...(ratings[r.id] || { rating: null, reviews: 0 }) }));
+}
+
+/**
+ * Рейтинг от отзивите (изглед contractor_ratings от supabase/2026-10-11-reviews.sql).
+ * Ако изгледът още липсва, майсторите се показват като „Нов, още без отзиви“.
+ */
+async function listRatings() {
+  try {
+    const { data, error } = await supabase.from("contractor_ratings").select("contractor_id,rating,reviews");
+    if (error) throw error;
+    return Object.fromEntries((data || []).map((r) => [r.contractor_id, { rating: Number(r.rating) || 0, reviews: Number(r.reviews) || 0 }]));
+  } catch (e) {
+    console.warn("Рейтингите не са налични:", e?.message || e);
+    return {};
+  }
 }
 
 export async function getMyContractor(userId) {

@@ -1,6 +1,7 @@
 import { CATEGORIES, SERVICE_BY_ID } from "../../data/catalog.js";
 import { initials } from "../../lib/format.js";
 import { viberChatLink, whatsappLink } from "../../lib/messaging.js";
+import Rating from "../../components/Rating.jsx";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
 
 export default function ContractorCard({ contractor: c, total, offered, negotiable, selected, qty, estimateTotal, onSend, sending }) {
@@ -22,6 +23,7 @@ export default function ContractorCard({ contractor: c, total, offered, negotiab
           <h3>
             {c.name} {c.demo && <span className="demo">{t("common.demo")}</span>}
           </h3>
+          <Rating c={c} />
           <div className="small muted">{c.person} · {c.city}</div>
         </div>
       </div>

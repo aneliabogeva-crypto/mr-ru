@@ -395,8 +395,6 @@ tr.off td{color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){.room-tile:hover{transform:translateY(-2px)}}
 .room-tile .room-ico{display:grid;place-items:center;width:52px;height:52px;border-radius:12px;background:var(--teal-soft);color:var(--teal);margin-bottom:8px}
 .room-tile .room-name{font-family:var(--f-display);font-size:18px;font-weight:700;letter-spacing:-.01em}
-.room-tile .room-meta{font-size:13px;color:var(--muted)}
-.room-tile .room-from{font-size:15px;font-weight:700;color:var(--teal);margin-top:4px}
 .room-tile .room-cta{margin-top:10px;font-size:13px;font-weight:600;color:var(--amber-ink);background:var(--amber);border-radius:999px;padding:5px 12px}
 
 .room-bar{display:flex;align-items:center;gap:12px;margin-bottom:16px;min-width:0}
@@ -473,16 +471,8 @@ body.modal-open{overflow:hidden}
 .consult-tog input{accent-color:var(--promo-bg)}
 
 /* ═══ Асистент „Спалня“ ═════════════════════════════════════════════════ */
-.room-badge{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--promo-bg);border-radius:4px;padding:2px 7px}
-.assistant{display:grid;gap:16px}
-.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.steps button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);cursor:pointer;text-align:left;font-weight:600;min-height:48px}
 .step-n{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);font-family:var(--f-display);font-size:13px}
 .step-t{min-width:0}
-.steps li.on button{border-color:var(--teal);color:var(--ink);box-shadow:inset 0 0 0 1px var(--teal)}
-.steps li.on .step-n{background:var(--teal);border-color:var(--teal);color:var(--teal-ink)}
-.steps li.done .step-n{background:var(--teal-soft);border-color:transparent;color:var(--teal)}
-.steps li.done button{color:var(--ink)}
 .city-card{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
 .city-label{font-family:var(--f-display);font-size:16px;font-weight:700;color:var(--ink)}
 select.city-lg{font-size:18px;font-weight:600;padding:12px 14px;min-height:52px;max-width:420px}
@@ -516,11 +506,37 @@ select.city-lg{font-size:18px;font-weight:600;padding:12px 14px;min-height:52px;
 .empty-left{display:grid;gap:12px}
 .promo-mini{background:var(--promo-bg);border-color:var(--promo-bg);color:#fff}
 @media (max-width:640px){
-  .steps{gap:6px}
-  .steps button{flex-direction:column;align-items:center;gap:4px;padding:8px 4px;text-align:center;font-size:12.5px}
   .act{grid-template-columns:minmax(0,1fr) auto}
   .act-main{grid-column:1/-1}
   .act-sum{justify-self:end}
   .as-total{grid-template-columns:minmax(0,1fr)}
   select.city-lg{max-width:none;width:100%}
+}
+
+/* Поток на калкулатора: един екран с вход, цена, услуги и местни майстори */
+.flow{display:grid;gap:24px}
+.req-star{color:#C2410C}
+.city-card.need{border-color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+.openings{display:grid;gap:8px}
+.opening{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr)) 40px;gap:8px;align-items:end;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.opening .field span{font-size:12px}
+.o-del{width:40px;height:40px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--muted);font-size:20px;line-height:1;cursor:pointer}
+.o-del:hover{color:#B42318;border-color:#B42318}
+.reveal-key{display:grid;gap:10px;margin-top:6px;padding:14px;border-radius:10px;border:2px solid var(--amber);background:var(--amber-soft)}
+.reveal-h{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-size:15px;font-weight:700;color:var(--ink)}
+.reveal-h svg{color:var(--amber-ink);background:var(--amber);border-radius:6px;padding:3px;width:24px;height:24px}
+.reveal-opt{background:var(--surface)}
+.reveal-nums{display:block;margin-top:6px;font-weight:700;font-size:13.5px;color:var(--teal)}
+.flow-price{display:grid;gap:8px}
+.flow-price .btn{justify-self:start;margin-top:4px}
+.need-city{font-weight:600;color:var(--muted);padding:6px 0}
+.rating{display:inline-flex;align-items:center;gap:6px;font-size:13px;margin-bottom:4px}
+.rating.new{color:var(--muted);font-style:italic}
+.stars{position:relative;display:inline-block;font-size:14px;letter-spacing:1px;line-height:1}
+.stars-bg{color:color-mix(in srgb,var(--muted) 35%,transparent)}
+.stars-fg{position:absolute;inset:0 auto 0 0;overflow:hidden;white-space:nowrap;color:var(--amber)}
+.small-h{font-size:15px;font-weight:600}
+@media (max-width:640px){
+  .opening{grid-template-columns:repeat(3,minmax(0,1fr)) 40px}
+  .opening .o-kind{grid-column:1/-1}
 }

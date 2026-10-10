@@ -1,5 +1,5 @@
 import { useI18n } from "../../../i18n/I18nProvider.jsx";
-import { ROOM_DEFS } from "../../../lib/rooms/index.js";
+import { ROOM_IDS } from "../../../lib/flow/roomFlow.js";
 
 const ICONS = {
   bath: "M4 12h16v2a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-2zM6 12V6a2 2 0 0 1 4 0M7 19l-1 2M17 19l1 2",
@@ -16,38 +16,28 @@ export const RoomIcon = ({ id, size = 26 }) => (
 );
 
 /**
- * Избор на помещение.
- * Голям изглед (начален екран) с типична площ и цена „от“;
- * компактен изглед (над калкулатора) за смяна на помещението.
+ * Избор на празна стая. Без примерни цени: цената излиза едва след
+ * като клиентът въведе града, размерите и състоянието.
+ * Голям изглед (начален екран) и компактен (над калкулатора) за смяна.
  */
-export default function RoomPicker({ value, onChange, summaries = {}, compact = false }) {
-  const { t, fmt } = useI18n();
+export default function RoomPicker({ value, onChange, compact = false }) {
+  const { t } = useI18n();
   return (
     <div className={compact ? "rooms rooms-compact" : "rooms-start"} role="radiogroup" aria-label={t("rooms.pick")}>
-      {ROOM_DEFS.map((r) => {
-        const s = summaries[r.id];
-        return (
-          <button
-            type="button"
-            key={r.id}
-            role="radio"
-            aria-checked={value === r.id}
-            className={(compact ? "room-card" : "room-tile") + (value === r.id ? " on" : "")}
-            onClick={() => onChange(r.id)}
-          >
-            <span className="room-ico"><RoomIcon id={r.id} size={compact ? 24 : 32} /></span>
-            <span className="room-name">{t(`rooms.${r.id}`)}</span>
-            {!compact && r.id === "bedroom" && <span className="room-badge">{t("rooms.assistantBadge")}</span>}
-            {!compact && s && (
-              <>
-                <span className="room-meta">{t("rooms.typical", { m2: fmt.num(s.floor, 1) })}</span>
-                <span className="room-from">{t("rooms.from", { price: fmt.eur0(s.total) })}</span>
-                <span className="room-cta">{t("rooms.choose")}</span>
-              </>
-            )}
-          </button>
-        );
-      })}
+      {ROOM_IDS.map((id) => (
+        <button
+          type="button"
+          key={id}
+          role="radio"
+          aria-checked={value === id}
+          className={(compact ? "room-card" : "room-tile") + (value === id ? " on" : "")}
+          onClick={() => onChange(id)}
+        >
+          <span className="room-ico"><RoomIcon id={id} size={compact ? 24 : 32} /></span>
+          <span className="room-name">{t(`rooms.${id}`)}</span>
+          {!compact && <span className="room-cta">{t("rooms.choose")}</span>}
+        </button>
+      ))}
     </div>
   );
 }
