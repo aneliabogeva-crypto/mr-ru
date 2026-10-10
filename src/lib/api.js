@@ -2,7 +2,22 @@
 import { appUrl, supabase } from "./supabase.js";
 import { defaultPrices } from "../data/catalog.js";
 
-const CONTRACTOR_COLUMNS = "id,user_id,name,person,phone,email,city,trades,prices,is_demo,quote_seq";
+const BASE_COLUMNS = "id,user_id,name,person,phone,email,city,trades,prices,is_demo,quote_seq";
+/** Колони от supabase/2026-10-10-contractor-profile.sql. Без тях приложението пак работи. */
+const PROFILE_COLUMNS = ["bio", "experience_years"];
+let hasProfileColumns = true;
+const columns = () => (hasProfileColumns ? `${BASE_COLUMNS},${PROFILE_COLUMNS.join(",")}` : BASE_COLUMNS);
+const isMissingColumn = (e) => e && (e.code === "42703" || e.code === "PGRST204" || /column/i.test(e.message || ""));
+
+/** Изпълнява заявка; ако новите колони липсват в базата, повтаря без тях. */
+async function withColumns(run) {
+  const res = await run(columns());
+  if (res.error && hasProfileColumns && isMissingColumn(res.error)) {
+    hasProfileColumns = false;
+    return run(columns());
+  }
+  return res;
+}
 
 const toContractor = (r) => ({
   id: r.id,
@@ -16,6 +31,8 @@ const toContractor = (r) => ({
   prices: r.prices || {},
   demo: r.is_demo,
   quoteSeq: r.quote_seq || 0,
+  bio: r.bio || "",
+  experience: r.experience_years ?? null,
 });
 
 const toRequest = (r) => ({
@@ -30,7 +47,7 @@ const toRequest = (r) => ({
 });
 
 /** Полетата на профила, които майсторът може да редактира. */
-const EDITABLE = { name: "name", person: "person", phone: "phone", email: "email", city: "city", trades: "trades", prices: "prices", quoteSeq: "quote_seq" };
+const EDITABLE = { name: "name", person: "person", phone: "phone", email: "email", city: "city", trades: "trades", prices: "prices", quoteSeq: "quote_seq", bio: "bio", experience: "experience_years" };
 
 const unwrap = ({ data, error }) => {
   if (error) throw error;
@@ -39,12 +56,12 @@ const unwrap = ({ data, error }) => {
 
 // ─── Майстори ──────────────────────────────────────────────────────────────
 export async function listContractors() {
-  const rows = unwrap(await supabase.from("contractors").select(CONTRACTOR_COLUMNS).order("is_demo").order("created_at"));
+  const rows = unwrap(await withColumns((cols) => supabase.from("contractors").select(cols).order("is_demo").order("created_at")));
   return rows.map(toContractor);
 }
 
 export async function getMyContractor(userId) {
-  const row = unwrap(await supabase.from("contractors").select(CONTRACTOR_COLUMNS).eq("user_id", userId).maybeSingle());
+  const row = unwrap(await withColumns((cols) => supabase.from("contractors").select(cols).eq("user_id", userId).maybeSingle()));
   return row ? toContractor(row) : null;
 }
 
@@ -53,7 +70,7 @@ export async function createContractor(userId, { name, person, phone, email, cit
     await supabase
       .from("contractors")
       .insert({ user_id: userId, name, person, phone, email, city, trades, prices: defaultPrices(trades) })
-      .select(CONTRACTOR_COLUMNS)
+      .select(BASE_COLUMNS)
       .single(),
   );
   return toContractor(row);
@@ -63,8 +80,16 @@ export async function createContractor(userId, { name, person, phone, email, cit
 export async function updateContractor(id, patch) {
   const row = {};
   for (const [key, column] of Object.entries(EDITABLE)) if (key in patch) row[column] = patch[key];
+  if (!hasProfileColumns) PROFILE_COLUMNS.forEach((c) => delete row[c]);
   if (!Object.keys(row).length) return;
-  unwrap(await supabase.from("contractors").update(row).eq("id", id));
+  const res = await supabase.from("contractors").update(row).eq("id", id);
+  if (res.error && isMissingColumn(res.error) && PROFILE_COLUMNS.some((c) => c in row)) {
+    hasProfileColumns = false;
+    PROFILE_COLUMNS.forEach((c) => delete row[c]);
+    if (Object.keys(row).length) unwrap(await supabase.from("contractors").update(row).eq("id", id));
+    return;
+  }
+  unwrap(res);
 }
 
 // ─── Запитвания ────────────────────────────────────────────────────────────

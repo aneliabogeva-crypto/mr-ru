@@ -76,7 +76,7 @@ function Workspace({ user, market, notify, onProfileSaved }) {
   const updateMe = (fn) =>
     setMe((prev) => {
       const next = fn(prev);
-      for (const k of ["name", "person", "phone", "email", "city", "trades", "prices", "quoteSeq"]) {
+      for (const k of ["name", "person", "phone", "email", "city", "trades", "prices", "quoteSeq", "bio", "experience"]) {
         if (next[k] !== prev[k]) pending.current[k] = next[k];
       }
       clearTimeout(timer.current);

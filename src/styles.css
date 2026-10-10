@@ -471,3 +471,56 @@ body.modal-open{overflow:hidden}
 .consult-pill{background:var(--promo-bg);color:#fff;border-color:transparent;margin-bottom:6px}
 .consult-tog{border-color:color-mix(in srgb,var(--promo-bg) 40%,var(--line))}
 .consult-tog input{accent-color:var(--promo-bg)}
+
+/* ═══ Асистент „Спалня“ ═════════════════════════════════════════════════ */
+.room-badge{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--promo-bg);border-radius:4px;padding:2px 7px}
+.assistant{display:grid;gap:16px}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.steps button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);cursor:pointer;text-align:left;font-weight:600;min-height:48px}
+.step-n{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);font-family:var(--f-display);font-size:13px}
+.step-t{min-width:0}
+.steps li.on button{border-color:var(--teal);color:var(--ink);box-shadow:inset 0 0 0 1px var(--teal)}
+.steps li.on .step-n{background:var(--teal);border-color:var(--teal);color:var(--teal-ink)}
+.steps li.done .step-n{background:var(--teal-soft);border-color:transparent;color:var(--teal)}
+.steps li.done button{color:var(--ink)}
+.city-card{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+.city-label{font-family:var(--f-display);font-size:16px;font-weight:700;color:var(--ink)}
+select.city-lg{font-size:18px;font-weight:600;padding:12px 14px;min-height:52px;max-width:420px}
+.step-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.acts{display:grid;gap:8px}
+.act{display:grid;grid-template-columns:minmax(0,1fr) auto 72px;align-items:center;gap:10px 12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.act.on{background:color-mix(in srgb,var(--teal-soft) 40%,var(--surface));border-color:color-mix(in srgb,var(--teal) 45%,var(--line))}
+.act:not(.on) .opt-label{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
+.act-main{display:flex;align-items:flex-start;gap:10px;cursor:pointer;min-width:0}
+.act-main input{flex:none;width:18px;height:18px;margin:2px 0 0;accent-color:var(--teal)}
+.act-qty{display:flex;align-items:center;gap:6px}
+.act-qty .inp{width:84px;text-align:right}
+.act-qty .u{font-size:12.5px;color:var(--muted);width:36px}
+.act-sum{text-align:right;font-weight:600;white-space:nowrap}
+.as-total{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end}
+.as-h{font-size:18px}
+.as-h.small-h{font-size:15px;color:var(--muted);font-family:var(--f-body);font-weight:600}
+.pin-city{display:inline-flex;align-items:center;gap:5px;font-weight:700;font-size:13px;color:var(--amber-ink);background:var(--amber);border-radius:999px;padding:3px 10px 3px 8px}
+.experts{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:14px}
+.expert{display:grid;gap:12px;padding:16px;align-content:start}
+.expert-top{display:flex;gap:12px;align-items:center}
+.ava-lg{width:52px;height:52px;border-radius:50%;font-size:17px}
+.expert h3{font-size:16px;margin-bottom:4px}
+.gap8{gap:8px}
+.expert-bio{font-size:14px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.offer{display:grid;gap:2px;padding:10px 12px;border-radius:8px;background:var(--teal-soft)}
+.offer-label{font-size:12.5px;color:var(--muted);font-weight:600}
+.offer-total{font-family:var(--f-display);font-size:24px;font-weight:700;color:var(--teal)}
+.offer-lines summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--teal)}
+.offer-lines .lines{margin-top:8px;max-height:none}
+.empty-left{display:grid;gap:12px}
+.promo-mini{background:var(--promo-bg);border-color:var(--promo-bg);color:#fff}
+@media (max-width:640px){
+  .steps{gap:6px}
+  .steps button{flex-direction:column;align-items:center;gap:4px;padding:8px 4px;text-align:center;font-size:12.5px}
+  .act{grid-template-columns:minmax(0,1fr) auto}
+  .act-main{grid-column:1/-1}
+  .act-sum{justify-self:end}
+  .as-total{grid-template-columns:minmax(0,1fr)}
+  select.city-lg{max-width:none;width:100%}
+}

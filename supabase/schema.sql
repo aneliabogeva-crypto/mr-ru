@@ -15,6 +15,8 @@ create table if not exists public.contractors (
   prices      jsonb not null default '{}'::jsonb,   -- {"t1": {"price": 18, "off": false}, ...}
   quote_seq   integer not null default 0,
   is_demo     boolean not null default false,
+  bio         text not null default '' check (char_length(bio) <= 600),
+  experience_years integer check (experience_years is null or experience_years between 0 and 60),
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );

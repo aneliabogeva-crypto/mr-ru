@@ -5,6 +5,7 @@ import ContractorCard from "./ContractorCard.jsx";
 import MobileEstimateBar from "./MobileEstimateBar.jsx";
 import ConsultPromo from "./ConsultPromo.jsx";
 import ConsultDialog from "./ConsultDialog.jsx";
+import BedroomAssistant from "./assistant/BedroomAssistant.jsx";
 import RoomPicker from "./rooms/RoomPicker.jsx";
 import RoomConfigurator from "./rooms/RoomConfigurator.jsx";
 import { BATHROOM_EXAMPLE } from "../../data/seed.js";
@@ -39,7 +40,9 @@ export default function ClientView({ contractors, loading, market, notify }) {
   const setCfg = (next) => setRoomCfgs((all) => ({ ...all, [room.id]: next }));
 
   const roomQty = useMemo(() => (room ? linesToQty(room.lines(cfg)) : {}), [room, cfg]);
-  const showCalc = mode === "services" || !!room;
+  // Спалнята минава през асистента (състояние → дейности → майстори).
+  const isAssistant = mode === "rooms" && room?.id === "bedroom";
+  const showCalc = mode === "services" || (!!room && !isAssistant);
   const qty = mode === "rooms" ? roomQty : serviceQty;
 
   const selected = useMemo(() => SERVICES.filter((s) => qty[s.id] > 0), [qty]);
@@ -116,7 +119,7 @@ export default function ClientView({ contractors, loading, market, notify }) {
   };
 
   const title = mode === "services" ? t("client.title") : room ? t("rooms.roomTitle", { room: t(`rooms.${room.id}.of`) }) : t("rooms.title");
-  const lead = mode === "services" ? t("client.lead") : room ? t("rooms.roomLead") : t("rooms.lead");
+  const lead = mode === "services" ? t("client.lead") : isAssistant ? t("assist.lead") : room ? t("rooms.roomLead") : t("rooms.lead");
 
   return (
     <>
@@ -150,6 +153,8 @@ export default function ClientView({ contractors, loading, market, notify }) {
           <RoomPicker value={room.id} onChange={pickRoom} compact />
         </div>
       )}
+
+      {isAssistant && <BedroomAssistant contractors={contractors} market={market} client={client} onClient={setClient} notify={notify} />}
 
       {showCalc && (
         <>

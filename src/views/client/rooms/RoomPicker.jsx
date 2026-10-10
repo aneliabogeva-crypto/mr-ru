@@ -37,6 +37,7 @@ export default function RoomPicker({ value, onChange, summaries = {}, compact = 
           >
             <span className="room-ico"><RoomIcon id={r.id} size={compact ? 24 : 32} /></span>
             <span className="room-name">{t(`rooms.${r.id}`)}</span>
+            {!compact && r.id === "bedroom" && <span className="room-badge">{t("rooms.assistantBadge")}</span>}
             {!compact && s && (
               <>
                 <span className="room-meta">{t("rooms.typical", { m2: fmt.num(s.floor, 1) })}</span>

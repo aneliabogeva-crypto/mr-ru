@@ -3,6 +3,7 @@ import { CATEGORIES } from "../../data/catalog.js";
 import { createContractor, signOut } from "../../lib/api.js";
 import { phoneDigits } from "../../lib/messaging.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
+import CitySelect from "../../components/CitySelect.jsx";
 
 /** Първо влизане: майсторът попълва профила си. */
 export default function Onboarding({ user, onCreated, notify }) {
@@ -17,6 +18,7 @@ export default function Onboarding({ user, onCreated, notify }) {
     if (!form.name.trim()) return notify(t("onboard.errName"));
     if (phoneDigits(form.phone).length < 6) return notify(t("onboard.errPhone"));
     if (!form.trades.length) return notify(t("onboard.errTrades"));
+    if (!form.city) return notify(t("onboard.errCity"));
     setBusy(true);
     try {
       const c = await createContractor(user.id, {
@@ -49,7 +51,7 @@ export default function Onboarding({ user, onCreated, notify }) {
         <label className="field"><span>{t("pro.fPerson")}</span><input id="ob-person" className="inp" value={form.person} onChange={set("person")} autoComplete="name" /></label>
         <label className="field"><span>{t("pro.fPhone")}</span><input id="ob-phone" className="inp" type="tel" value={form.phone} onChange={set("phone")} autoComplete="tel" placeholder="+359…" /></label>
         <label className="field"><span>{t("pro.fEmail")}</span><input id="ob-email" className="inp" type="email" value={form.email} onChange={set("email")} /></label>
-        <label className="field"><span>{t("pro.fCity")}</span><input id="ob-city" className="inp" value={form.city} onChange={set("city")} /></label>
+        <label className="field"><span>{t("pro.fCity")}</span><CitySelect id="ob-city" value={form.city} onChange={(v) => setForm({ ...form, city: v })} /></label>
         <div className="field">
           <span>{t("pro.trades")}</span>
           <div className="chips">
