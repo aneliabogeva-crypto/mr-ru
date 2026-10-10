@@ -224,6 +224,7 @@ export default function RoomFlow({ room, contractors, loading, market, client, o
                 <div className="range">{t("client.range", { min: fmt.eur0(est.min), max: fmt.eur0(est.max) })}</div>
                 <p className="small muted">{t("flow.priceBasis", { walls: fmt.num(g.walls), floor: fmt.num(g.floor), lm: fmt.num(g.reveals), mode: t(`flow.mode.${c.revealMode}`) })}</p>
                 {!isSofia && <p className="note">{t("assist.sofiaNote", { city })}</p>}
+                <OffersPreview rows={[...match.full, ...match.partial].slice(0, 3)} total={Object.keys(qty).length} more={nLocal} city={city} loading={loading} />
                 <button type="button" className="btn btn-p" onClick={toServices}>{nLocal ? tn("flow.toResults", nLocal) : t("flow.toResults")}</button>
               </>
             ) : (
@@ -317,7 +318,8 @@ export default function RoomFlow({ room, contractors, loading, market, client, o
             </div>
 
             {loading && <div className="card empty">{t("common.loading")}</div>}
-            {!loading && match.full.length === 0 && (
+            {!loading && match.full.length === 0 && match.partial.length > 0 && <p className="small muted">{t("flow.partialOnly")}</p>}
+            {!loading && match.full.length === 0 && match.partial.length === 0 && (
               <div className="card pad empty-left">
                 <p>{match.localCount ? t("assist.noneFull", { city }) : t("assist.noneCity", { city })}</p>
                 <div className="row">
@@ -363,12 +365,41 @@ const PinIcon = () => (
   </svg>
 );
 
+/** Първите оферти в картата с цената, за да се виждат веднага след въвеждането. */
+function OffersPreview({ rows, total, more, city, loading }) {
+  const { t, fmt } = useI18n();
+  const go = (id) => {
+    const el = document.getElementById(`ex-${id}`) || document.getElementById("masters");
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  if (loading) return null;
+  if (!rows.length) return <p className="small muted">{t("assist.noneCity", { city })}</p>;
+  return (
+    <div className="offers-mini">
+      <span className="offer-label">{t("flow.offersTitle", { city })}</span>
+      {rows.map((r) => (
+        <button key={r.contractor.id} type="button" className="offer-mini" onClick={() => go(r.contractor.id)}>
+          <span className="min0">
+            <span className="om-name">{r.contractor.name}</span>
+            <span className="om-meta">
+              {r.contractor.reviews > 0 ? `★ ${fmt.num(r.contractor.rating, 1)}` : t("flow.newShort")}
+              {r.missing.length ? ` · ${t("assist.covers", { a: r.covered, b: total })}` : ` · ${t("flow.coversAll")}`}
+            </span>
+          </span>
+          <span className="om-price">~{fmt.eur0(r.total)}</span>
+        </button>
+      ))}
+      {more > rows.length && <span className="small muted">{t("flow.moreOffers", { n: more - rows.length })}</span>}
+    </div>
+  );
+}
+
 function ExpertCard({ row, city, room, name, onSend, sending, sent, partial, total }) {
   const { t, unit, fmt } = useI18n();
   const c = row.contractor;
   const msg = t("flow.waMessage", { person: c.person || c.name, room, list: row.lines.filter((l) => l.price !== null).map((l) => name(l.sid)).join(", "), total: fmt.eur0(row.total) });
   return (
-    <article className="card expert">
+    <article className="card expert" id={`ex-${c.id}`}>
       <div className="expert-top">
         <div className="ava ava-lg" aria-hidden="true">{initials(c.name)}</div>
         <div className="min0">

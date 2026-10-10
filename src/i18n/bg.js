@@ -469,4 +469,9 @@ export default {
   "flow.openingShort": "{kind} {w}×{h} см ×{n}",
   "flow.requestContext": "{room}: {dims}, височина {h} м, {city}. Таван: {ceiling}. Стени: {walls}. Под: {floorNow} → {floorNew}. Отвори: {openings}. Обръщане: {mode}, {lm} л.м.",
   "flow.waMessage": "Здравейте, {person}! Пиша ви от Mr.Ru за ремонт ({room}). Интересувам се от: {list}. Примерната оферта по вашите цени е ~{total}.",
+  "flow.offersTitle": "Примерни оферти от майстори в {city}",
+  "flow.newShort": "Нов",
+  "flow.coversAll": "всички дейности",
+  "flow.moreOffers": "и още {n} по-долу",
+  "flow.partialOnly": "Никой майстор не прави всичко избрано. Офертите по-долу показват кой какво покрива; за останалото може да се договорите или да вземете втори майстор.",
 };

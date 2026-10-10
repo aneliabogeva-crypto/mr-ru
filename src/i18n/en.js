@@ -469,4 +469,9 @@ export default {
   "flow.openingShort": "{kind} {w}×{h} cm ×{n}",
   "flow.requestContext": "{room}: {dims}, height {h} m, {city}. Ceiling: {ceiling}. Walls: {walls}. Floor: {floorNow} → {floorNew}. Openings: {openings}. Reveals: {mode}, {lm} lm.",
   "flow.waMessage": "Hello {person}! I'm writing from Mr.Ru about a renovation ({room}). I'm interested in: {list}. The sample quote at your prices is ~{total}.",
+  "flow.offersTitle": "Sample quotes from contractors in {city}",
+  "flow.newShort": "New",
+  "flow.coversAll": "all jobs",
+  "flow.moreOffers": "and {n} more below",
+  "flow.partialOnly": "No contractor does everything selected. The quotes below show who covers what; agree on the rest or hire a second contractor.",
 };

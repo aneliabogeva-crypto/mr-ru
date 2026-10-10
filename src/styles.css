@@ -540,3 +540,10 @@ select.city-lg{font-size:18px;font-weight:600;padding:12px 14px;min-height:52px;
   .opening{grid-template-columns:repeat(3,minmax(0,1fr)) 40px}
   .opening .o-kind{grid-column:1/-1}
 }
+.offers-mini{display:grid;gap:6px;padding-top:10px;border-top:1px dashed var(--line)}
+.offer-mini{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-align:left;cursor:pointer}
+.offer-mini:hover{border-color:var(--teal)}
+.offer-mini .min0{display:grid;gap:2px}
+.om-name{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.om-meta{font-size:12px;color:var(--muted)}
+.om-price{font-family:var(--f-display);font-weight:700;color:var(--teal);white-space:nowrap}

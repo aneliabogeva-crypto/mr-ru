@@ -87,7 +87,7 @@ export const SERVICES = [
   s("j2", "jo", "pc", "Монтаж на входна врата", "Install entrance door"),
   s("j3", "jo", "m2", "Монтаж на PVC прозорец", "Install PVC window"),
   s("j4", "jo", "lm", "Монтаж на подпрозоречна дъска", "Install window sill"),
-  s("j5", "jo", "lm", "Обръщане около прозорци и врати (шпакловка)", "Reveal finishing around windows and doors"),
+  s("j5", "pl", "lm", "Обръщане около прозорци и врати (шпакловка)", "Reveal finishing around windows and doors"),
 ];
 
 export const SERVICE_BY_ID = Object.fromEntries(SERVICES.map((x) => [x.id, x]));

@@ -96,3 +96,12 @@ select * from (values
   ('Бригада Странджа', 'Петко Янев', '+359 878 902 615', 'strandzha.brigada@gmail.com', 'София', array['de','pl','tf','jo']::text[], '{"el1":{"price":6,"off":true},"el2":{"price":22.5,"off":true},"el3":{"price":6,"off":true},"el4":{"price":16,"off":true},"el5":{"price":176.5,"off":true},"el6":{"price":5.5,"off":true},"el7":{"price":22,"off":true},"v1":{"price":115.5,"off":true},"v2":{"price":76,"off":true},"v3":{"price":128.5,"off":true},"v4":{"price":27.5,"off":true},"v5":{"price":70.5,"off":true},"v6":{"price":58,"off":true},"v7":{"price":30.5,"off":true},"v8":{"price":68.5,"off":true},"v9":{"price":173,"off":true},"v10":{"price":183.5,"off":true},"v11":{"price":65,"off":true},"v12":{"price":114.5,"off":true},"v13":{"price":14,"off":true},"v14":{"price":148,"off":true},"p1":{"price":12.5,"off":false},"p2":{"price":11,"off":false},"p3":{"price":19.5,"off":false},"p4":{"price":17.5,"off":false},"p5":{"price":10.5,"off":false},"p6":{"price":5,"off":false},"p7":{"price":15.5,"off":false},"p8":{"price":22,"off":false},"p9":{"price":18.5,"off":false},"p10":{"price":87.5,"off":false},"t1":{"price":39.5,"off":false},"t2":{"price":32.5,"off":false},"t3":{"price":5.5,"off":false},"t4":{"price":8.5,"off":false},"t5":{"price":12,"off":false},"t6":{"price":9.5,"off":false},"t7":{"price":29.5,"off":false},"t8":{"price":12.5,"off":false},"t9":{"price":56.5,"off":false},"t10":{"price":64,"off":false},"a1":{"price":2.5,"off":true},"a2":{"price":5,"off":true},"a3":{"price":11.5,"off":true},"a4":{"price":10.5,"off":true},"a5":{"price":5,"off":true},"d1":{"price":15,"off":false},"d2":{"price":4.5,"off":false},"d3":{"price":11.5,"off":false},"d4":{"price":110.5,"off":false},"d5":{"price":36.5,"off":false},"j1":{"price":24,"off":false},"j2":{"price":65.5,"off":false},"j3":{"price":30,"off":false},"j4":{"price":29,"off":false},"j5":{"price":16,"off":false}}'::jsonb, true)
 ) as v(name, person, phone, email, city, trades, prices, is_demo)
 where not exists (select 1 from public.contractors where is_demo);
+
+-- Обръщане (j5) е шпакловъчна работа: включена за майсторите с „pl“.
+update public.contractors
+set prices = jsonb_set(
+  prices, '{j5}',
+  jsonb_build_object('price', coalesce((prices -> 'j5' ->> 'price')::numeric, 18), 'off', false)
+)
+where 'pl' = any (trades)
+  and coalesce((prices -> 'j5' ->> 'off')::boolean, true);
