@@ -9,7 +9,7 @@ export const quoteNumber = (seq, year = new Date().getFullYear()) => `MR-${year}
 /** Създава нова оферта, по желание от клиентско запитване. */
 export function createQuote({ no, contractor, request, lang, defaultNotes }) {
   const lines = request
-    ? request.items.map((it, i) => {
+    ? request.items.filter((it) => SERVICE_BY_ID[it.sid]).map((it, i) => {
         const svc = SERVICE_BY_ID[it.sid];
         const p = priceOf(contractor, it.sid);
         return {

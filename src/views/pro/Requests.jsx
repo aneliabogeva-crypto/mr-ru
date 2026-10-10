@@ -1,5 +1,6 @@
 import { SERVICE_BY_ID, priceOf } from "../../data/catalog.js";
 import { viberChatLink, whatsappLink } from "../../lib/messaging.js";
+import { consultTopic, isConsult } from "../../lib/consult.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
 
 const STATUS_TONE = { new: "warn", seen: "", quoted: "ok", closed: "" };
@@ -29,7 +30,8 @@ export default function Requests({ list, me, onQuote, onStatus, onRefresh }) {
     <div className="stack">
       {toolbar}
       {list.map((r) => {
-        const negotiable = r.items.filter((it) => priceOf(me, it.sid).off).length;
+        if (isConsult(r)) return <ConsultRequest key={r.id} r={r} onStatus={onStatus} />;
+        const negotiable = r.items.filter((it) => SERVICE_BY_ID[it.sid] && priceOf(me, it.sid).off).length;
         const own = r.items.reduce((a, it) => {
           const p = priceOf(me, it.sid);
           return a + (!p.off ? p.price * it.qty : 0);
@@ -79,5 +81,46 @@ export default function Requests({ list, me, onQuote, onStatus, onRefresh }) {
         );
       })}
     </div>
+  );
+}
+
+/** Запитване за консултация: тема, описание, контакти. Цената се договаря. */
+function ConsultRequest({ r, onStatus }) {
+  const { t, fmt } = useI18n();
+  return (
+    <article className="card req req-consult">
+      <div className="q-head">
+        <div>
+          <span className="pill consult-pill">{t("consult.badge")}</span>
+          <h3>{r.client.name}</h3>
+          <div className="small muted">
+            {fmt.date(r.date)} · {r.client.city || "—"} · <span className="phone">{r.client.phone}</span>
+            {r.client.email && <> · <span className="phone">{r.client.email}</span></>}
+          </div>
+        </div>
+        <StatusSelect r={r} onStatus={onStatus} />
+      </div>
+      <div className="small"><strong>{t("consult.topicLabel")}:</strong> {t(`consult.topic.${consultTopic(r)}`)}</div>
+      {r.comment && <div className="small muted">„{r.comment}“</div>}
+      <div className="row between">
+        <div className="small">{t("consult.proPrice")}</div>
+        <div className="actions">
+          <a className="btn btn-s btn-viber" href={viberChatLink(r.client.phone)}>Viber</a>
+          <a className="btn btn-s btn-wa" href={whatsappLink(r.client.phone)} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function StatusSelect({ r, onStatus }) {
+  const { t } = useI18n();
+  return (
+    <label className="status-pick">
+      <span className="sr-only">{t("pro.status")}</span>
+      <select id={`st-${r.id}`} className={"inp pill " + STATUS_TONE[r.status]} value={r.status} onChange={(e) => onStatus(r, e.target.value)}>
+        {STATUSES.map((s) => <option key={s} value={s}>{t(`pro.status_${s}`)}</option>)}
+      </select>
+    </label>
   );
 }

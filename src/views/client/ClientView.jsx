@@ -3,6 +3,8 @@ import Calculator from "./Calculator.jsx";
 import EstimatePanel from "./EstimatePanel.jsx";
 import ContractorCard from "./ContractorCard.jsx";
 import MobileEstimateBar from "./MobileEstimateBar.jsx";
+import ConsultPromo from "./ConsultPromo.jsx";
+import ConsultDialog from "./ConsultDialog.jsx";
 import RoomPicker from "./rooms/RoomPicker.jsx";
 import RoomConfigurator from "./rooms/RoomConfigurator.jsx";
 import { BATHROOM_EXAMPLE } from "../../data/seed.js";
@@ -129,6 +131,8 @@ export default function ClientView({ contractors, loading, market, notify }) {
         <button type="button" aria-pressed={mode === "services"} onClick={() => setMode("services")}>{t("rooms.modeServices")}</button>
       </div>
 
+      {mode === "rooms" && !room && <ConsultPromo />}
+
       <div className="disc" role="note">
         <span className="mark" aria-hidden="true">!</span>
         <p>
@@ -198,6 +202,7 @@ export default function ClientView({ contractors, loading, market, notify }) {
           <MobileEstimateBar est={est} count={selected.length} />
         </>
       )}
+      <ConsultDialog contractors={contractors} client={client} onClient={setClient} notify={notify} />
     </>
   );
 }

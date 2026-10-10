@@ -6,15 +6,16 @@
   --ok:#23805A; --ok-soft:#DDF1E7; --warn:#B4541A; --warn-soft:#FBE6D8; --shadow:0 1px 2px rgba(14,42,51,.06),0 8px 24px rgba(14,42,51,.07);
   --f-display:"Unbounded","Golos Text",system-ui,sans-serif; --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --r:10px;
+  --promo-bg:#2B2870; --promo-bg-2:#3A36A0; --promo-fg:#FFFFFF; --promo-muted:#C9C7F2; --promo-chip:rgba(255,255,255,.12); --promo-line:rgba(255,255,255,.22);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0A181C; --surface:#10242A; --surface-2:#0D1F24; --ink:#E3EFF1; --muted:#8EA6AC; --line:#21404A;
   --teal:#38BEC6; --teal-ink:#06262A; --teal-soft:#123A40; --amber:#F5B731; --amber-ink:#2B1D00; --amber-soft:#3A2D0E;
-  --ok:#5CCB98; --ok-soft:#123528; --warn:#F09A62; --warn-soft:#3B2416; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
+  --ok:#5CCB98; --ok-soft:#123528; --warn:#F09A62; --warn-soft:#3B2416; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); --promo-bg:#36329A; --promo-bg-2:#4A45C2; --promo-fg:#FFFFFF; --promo-muted:#D6D4FF; --promo-chip:rgba(255,255,255,.14); --promo-line:rgba(255,255,255,.26); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0A181C; --surface:#10242A; --surface-2:#0D1F24; --ink:#E3EFF1; --muted:#8EA6AC; --line:#21404A;
   --teal:#38BEC6; --teal-ink:#06262A; --teal-soft:#123A40; --amber:#F5B731; --amber-ink:#2B1D00; --amber-soft:#3A2D0E;
-  --ok:#5CCB98; --ok-soft:#123528; --warn:#F09A62; --warn-soft:#3B2416; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
+  --ok:#5CCB98; --ok-soft:#123528; --warn:#F09A62; --warn-soft:#3B2416; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); --promo-bg:#36329A; --promo-bg-2:#4A45C2; --promo-fg:#FFFFFF; --promo-muted:#D6D4FF; --promo-chip:rgba(255,255,255,.14); --promo-line:rgba(255,255,255,.26); color-scheme:dark}
 *{box-sizing:border-box}
 html,body{background:var(--bg);color:var(--ink)}
 body{font-family:var(--f-body);font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums}
@@ -419,3 +420,54 @@ tr.off td{color:var(--muted)}
   .room-tile .room-name{font-size:16px}
   .room-tile .room-cta{display:none}
 }
+
+/* ═══ Консултации ═══════════════════════════════════════════════════════ */
+.promo{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 28px;align-items:center;margin-bottom:18px;padding:24px 26px;border-radius:14px;color:var(--promo-fg);
+  background:radial-gradient(120% 140% at 100% 0%,var(--promo-bg-2) 0%,var(--promo-bg) 55%);box-shadow:var(--shadow)}
+.promo::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;opacity:.9;background:
+  repeating-linear-gradient(90deg,var(--amber-ink) 0 1px,transparent 1px 10px) bottom/100% 8px no-repeat,
+  repeating-linear-gradient(90deg,var(--amber-ink) 0 1px,transparent 1px 5px) bottom/100% 4px no-repeat, var(--amber)}
+.promo-text{display:grid;gap:8px;min-width:0}
+.promo-eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber)}
+.promo h2{font-size:clamp(20px,2.6vw,26px);color:var(--promo-fg)}
+.promo-lead{color:var(--promo-muted);max-width:62ch}
+.promo-points{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.promo-point{border:1px solid var(--promo-line);background:var(--promo-chip);color:var(--promo-fg);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:500;cursor:pointer}
+.promo-point:hover{background:rgba(255,255,255,.22)}
+.promo-cta{display:grid;gap:8px;justify-items:center;text-align:center;padding-bottom:6px}
+.promo-btn{background:var(--amber);border-color:var(--amber);color:#2B1D00;font-size:15.5px;padding:13px 22px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.promo-btn:hover{filter:brightness(1.06);border-color:var(--amber)}
+.promo-price{font-size:12.5px;color:var(--promo-muted);max-width:24ch}
+@media (max-width:760px){
+  .promo{grid-template-columns:minmax(0,1fr);padding:20px 18px 24px}
+  .promo-cta{justify-items:stretch;text-align:left}
+  .promo-btn{width:100%}
+  .promo-price{max-width:none}
+}
+
+/* прозорец */
+body.modal-open{overflow:hidden}
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(10,20,30,.55)}
+.modal-panel{width:min(760px,100%);max-height:calc(100dvh - 32px);max-height:calc(100vh - 32px);display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+.modal-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px;color:var(--promo-fg);background:radial-gradient(120% 160% at 100% 0%,var(--promo-bg-2) 0%,var(--promo-bg) 60%)}
+.modal-h h2{color:var(--promo-fg);font-size:20px;margin-top:2px}
+.modal-h .btn{background:transparent;border-color:var(--promo-line);color:var(--promo-fg)}
+.modal-b{padding:18px 20px 22px;overflow:auto}
+.consult .chips .chip[aria-checked="true"]{background:var(--promo-bg);color:#fff;border-color:var(--promo-bg)}
+.consult-price{padding:10px 12px;border-radius:8px;background:var(--amber-soft);font-size:14px}
+.consultants{display:grid;gap:10px}
+.consultant{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:10px}
+.consultant h3{font-size:15px}
+@media (max-width:640px){
+  .modal{padding:0;place-items:end stretch}
+  .modal-panel{width:100%;max-height:92dvh;max-height:92vh;border-radius:16px 16px 0 0}
+  .modal-b{padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+  .consultant{grid-template-columns:minmax(0,1fr)}
+}
+
+/* в чата и при майстора */
+.chat-consult{display:flex;margin-top:8px;background:var(--promo-bg);border-color:var(--promo-bg);color:#fff}
+.chip-consult{background:var(--promo-bg);border-color:var(--promo-bg);color:#fff}
+.consult-pill{background:var(--promo-bg);color:#fff;border-color:transparent;margin-bottom:6px}
+.consult-tog{border-color:color-mix(in srgb,var(--promo-bg) 40%,var(--line))}
+.consult-tog input{accent-color:var(--promo-bg)}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FAQ } from "../data/faq.js";
 import { answer } from "../lib/chatbot.js";
+import { openConsult } from "../lib/consult.js";
 import { useI18n } from "../i18n/I18nProvider.jsx";
 
 export default function Chatbot({ market }) {
@@ -21,21 +22,27 @@ export default function Chatbot({ market }) {
     return () => window.removeEventListener("mrru:open-chat", onOpen);
   }, []);
 
+  /** Отговор: { text, action }. action „consult“ показва бутон за връзка с майстор. */
   const reply = (text) => {
     const r = answer(text, lang);
     if (r?.type === "price") {
       const m = market[r.service.id];
-      return t("chat.priceAnswer", { name: pick(r.service.name), avg: fmt.eur(m.avg), unit: unit(r.service.unit), min: fmt.eur(m.min), max: fmt.eur(m.max) });
+      return { text: t("chat.priceAnswer", { name: pick(r.service.name), avg: fmt.eur(m.avg), unit: unit(r.service.unit), min: fmt.eur(m.min), max: fmt.eur(m.max) }) };
     }
-    if (r?.type === "faq") return pick(r.faq.a);
-    return t("chat.fallback");
+    if (r?.type === "faq") return { text: pick(r.faq.a), action: r.faq.action };
+    return { text: t("chat.fallback"), action: "consult" };
   };
 
   const ask = (text) => {
     const q = text.trim();
     if (!q) return;
     setInput("");
-    setMessages((m) => [...m, { who: "me", text: q }, { who: "bot", text: reply(q) }]);
+    setMessages((m) => [...m, { who: "me", text: q }, { who: "bot", ...reply(q) }]);
+  };
+
+  const startConsult = () => {
+    setOpen(false);
+    openConsult();
   };
 
   return (
@@ -68,12 +75,18 @@ export default function Chatbot({ market }) {
           <div className="chat-b" ref={body} aria-live="polite">
             <div className="msg bot">{t("chat.welcome")}</div>
             {messages.map((m, i) => (
-              <div key={i} className={"msg " + m.who}>{m.text}</div>
+              <div key={i} className={"msg " + m.who}>
+                {m.text}
+                {m.action === "consult" && (
+                  <button type="button" className="btn btn-s chat-consult" onClick={startConsult}>{t("chat.consultBtn")}</button>
+                )}
+              </div>
             ))}
           </div>
           <div className="chat-f">
             <div className="chips">
-              {FAQ.slice(0, 8).map((f) => (
+              <button type="button" className="chip chip-consult" onClick={startConsult}>{t("chat.consultChip")}</button>
+              {FAQ.slice(1, 8).map((f) => (
                 <button type="button" key={f.id} className="chip" onClick={() => ask(pick(f.q))}>{pick(f.q)}</button>
               ))}
             </div>

@@ -3,6 +3,16 @@
 
 export const FAQ = [
   {
+    id: "consult",
+    action: "consult",
+    keys: ["консулт", "съвет", "сам ", "сама", "направи си", "откъде да започна", "как да започна", "consult", "advice", "diy", "myself", "where to start"],
+    q: { bg: "Мога ли да се консултирам с майстор?", en: "Can I get advice from a contractor?" },
+    a: {
+      bg: "Да. Ако ще ремонтирате сами или имате нужда от съвет, свържете се с майстор за консултация: откъде да започнете, какви материали и колко, в какъв ред да вървят етапите, проверка на оферта или оглед на място. Цената на консултацията се договаря директно с майстора.",
+      en: "Yes. If you're renovating yourself or need advice, contact a contractor for a consultation: where to start, which materials and how much, the order of the work, checking a quote, or a site visit. The consultation price is agreed directly with the contractor.",
+    },
+  },
+  {
     id: "pricing",
     keys: ["изчисл", "пресмят", "средн", "пазар", "calculat", "average", "market"],
     q: { bg: "Как се изчислява цената?", en: "How is the price calculated?" },

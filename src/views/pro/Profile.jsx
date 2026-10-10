@@ -1,5 +1,6 @@
 import { CATEGORIES } from "../../data/catalog.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
+import { CONSULT_SID, offersConsult } from "../../lib/consult.js";
 
 const FIELDS = [
   { key: "name", label: "pro.fCompany" },
@@ -29,6 +30,18 @@ export default function Profile({ me, updateMe }) {
           />
         </label>
       ))}
+      <label className="tog consult-tog" htmlFor="pf-consult">
+        <input
+          id="pf-consult"
+          type="checkbox"
+          checked={offersConsult(me)}
+          onChange={(e) => updateMe((c) => ({ ...c, prices: { ...c.prices, [CONSULT_SID]: { price: 0, off: !e.target.checked } } }))}
+        />
+        <span className="opt-body">
+          <span className="opt-label">{t("consult.proToggle")}</span>
+          <span className="opt-hint">{t("consult.proToggleHint")}</span>
+        </span>
+      </label>
       <div className="field">
         <span>{t("pro.trades")}</span>
         <div className="chips">
