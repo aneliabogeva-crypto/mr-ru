@@ -8,7 +8,7 @@ import {
   CEILING_NOW, FLOOR_NOW, FLOW_DEFAULTS, LIMITS, OPENING_KINDS, REVEAL_MODES, WALLS_NOW,
   flowGeometry, flowServices, floorsNewFor, matchContractors, newOpening, selectedQty, wallsNewFor,
 } from "../../../lib/flow/roomFlow.js";
-import { normalizeCity } from "../../../lib/cities.js";
+import { canonicalCity, normalizeCity, sameCity } from "../../../lib/cities.js";
 import { openConsult } from "../../../lib/consult.js";
 import { estimate } from "../../../lib/market.js";
 import { initials } from "../../../lib/format.js";
@@ -47,7 +47,14 @@ export default function RoomFlow({ room, contractors, loading, market, client, o
   const list = useMemo(() => flowServices(room, c), [room, saved]); // eslint-disable-line react-hooks/exhaustive-deps
   const qty = useMemo(() => selectedQty(list), [list]);
   const est = useMemo(() => estimate(qty, market), [qty, market]);
-  const match = useMemo(() => matchContractors(contractors, city, qty, sort), [contractors, city, qty, sort]);
+  const localMatch = useMemo(() => matchContractors(contractors, city, qty, sort), [contractors, city, qty, sort]);
+  // Ако в града още няма майстори, показваме майстори от други градове (може да пътуват).
+  const otherMatch = useMemo(
+    () => (city && !localMatch.localCount ? matchContractors(contractors.filter((x) => !sameCity(x.city, city)), null, qty, sort) : null),
+    [contractors, city, qty, sort, localMatch.localCount],
+  );
+  const fromOther = !!otherMatch && otherMatch.localCount > 0;
+  const match = fromOther ? otherMatch : localMatch;
   const nLocal = match.full.length + match.partial.length;
   const chosen = list.filter((a) => a.on && a.qty > 0);
   const diy = list.filter((a) => !a.on && a.suggestedOn);
@@ -224,7 +231,7 @@ export default function RoomFlow({ room, contractors, loading, market, client, o
                 <div className="range">{t("client.range", { min: fmt.eur0(est.min), max: fmt.eur0(est.max) })}</div>
                 <p className="small muted">{t("flow.priceBasis", { walls: fmt.num(g.walls), floor: fmt.num(g.floor), lm: fmt.num(g.reveals), mode: t(`flow.mode.${c.revealMode}`) })}</p>
                 {!isSofia && <p className="note">{t("assist.sofiaNote", { city })}</p>}
-                <OffersPreview rows={[...match.full, ...match.partial].slice(0, 3)} total={Object.keys(qty).length} more={nLocal} city={city} loading={loading} />
+                <OffersPreview rows={[...match.full, ...match.partial].slice(0, 3)} total={Object.keys(qty).length} more={nLocal} city={city} fromOther={fromOther} loading={loading} />
                 <button type="button" className="btn btn-p" onClick={toServices}>{nLocal ? tn("flow.toResults", nLocal) : t("flow.toResults")}</button>
               </>
             ) : (
@@ -300,7 +307,7 @@ export default function RoomFlow({ room, contractors, loading, market, client, o
             <div className="row between end fwrap gap12">
               <div className="stack tight">
                 <span className="label">{t("flow.mastersEyebrow")}</span>
-                <h2>{t("flow.mastersTitle", { city })}</h2>
+                <h2>{fromOther ? t("flow.mastersOther") : t("flow.mastersTitle", { city })}</h2>
               </div>
               <div className="seg" role="group" aria-label={t("flow.sortLabel")}>
                 {["price", "rating"].map((s) => (
@@ -318,6 +325,7 @@ export default function RoomFlow({ room, contractors, loading, market, client, o
             </div>
 
             {loading && <div className="card empty">{t("common.loading")}</div>}
+            {fromOther && <p className="card pad other-note">{t("flow.noneCityOther", { city })}</p>}
             {!loading && match.full.length === 0 && match.partial.length > 0 && <p className="small muted">{t("flow.partialOnly")}</p>}
             {!loading && match.full.length === 0 && match.partial.length === 0 && (
               <div className="card pad empty-left">
@@ -329,7 +337,7 @@ export default function RoomFlow({ room, contractors, loading, market, client, o
             )}
             <div className="experts">
               {match.full.map((row) => (
-                <ExpertCard key={row.contractor.id} row={row} city={city} room={roomName} name={name} onSend={send} sending={sendingTo === row.contractor.id} sent={sentTo.includes(row.contractor.id)} />
+                <ExpertCard key={row.contractor.id} row={row} room={roomName} name={name} onSend={send} sending={sendingTo === row.contractor.id} sent={sentTo.includes(row.contractor.id)} />
               ))}
             </div>
             {match.partial.length > 0 && (
@@ -337,7 +345,7 @@ export default function RoomFlow({ room, contractors, loading, market, client, o
                 <h3 className="as-h small-h">{t("assist.partialTitle", { n: match.partial.length })}</h3>
                 <div className="experts">
                   {match.partial.map((row) => (
-                    <ExpertCard key={row.contractor.id} row={row} city={city} room={roomName} name={name} onSend={send} sending={sendingTo === row.contractor.id} sent={sentTo.includes(row.contractor.id)} partial total={Object.keys(qty).length} />
+                    <ExpertCard key={row.contractor.id} row={row} room={roomName} name={name} onSend={send} sending={sendingTo === row.contractor.id} sent={sentTo.includes(row.contractor.id)} partial total={Object.keys(qty).length} />
                   ))}
                 </div>
               </>
@@ -366,7 +374,7 @@ const PinIcon = () => (
 );
 
 /** Първите оферти в картата с цената, за да се виждат веднага след въвеждането. */
-function OffersPreview({ rows, total, more, city, loading }) {
+function OffersPreview({ rows, total, more, city, fromOther, loading }) {
   const { t, fmt } = useI18n();
   const go = (id) => {
     const el = document.getElementById(`ex-${id}`) || document.getElementById("masters");
@@ -376,12 +384,13 @@ function OffersPreview({ rows, total, more, city, loading }) {
   if (!rows.length) return <p className="small muted">{t("assist.noneCity", { city })}</p>;
   return (
     <div className="offers-mini">
-      <span className="offer-label">{t("flow.offersTitle", { city })}</span>
+      <span className="offer-label">{fromOther ? t("flow.offersOther", { city }) : t("flow.offersTitle", { city })}</span>
       {rows.map((r) => (
         <button key={r.contractor.id} type="button" className="offer-mini" onClick={() => go(r.contractor.id)}>
           <span className="min0">
             <span className="om-name">{r.contractor.name}</span>
             <span className="om-meta">
+              {fromOther ? `${canonicalCity(r.contractor.city) || r.contractor.city} · ` : ""}
               {r.contractor.reviews > 0 ? `★ ${fmt.num(r.contractor.rating, 1)}` : t("flow.newShort")}
               {r.missing.length ? ` · ${t("assist.covers", { a: r.covered, b: total })}` : ` · ${t("flow.coversAll")}`}
             </span>
@@ -394,7 +403,7 @@ function OffersPreview({ rows, total, more, city, loading }) {
   );
 }
 
-function ExpertCard({ row, city, room, name, onSend, sending, sent, partial, total }) {
+function ExpertCard({ row, room, name, onSend, sending, sent, partial, total }) {
   const { t, unit, fmt } = useI18n();
   const c = row.contractor;
   const msg = t("flow.waMessage", { person: c.person || c.name, room, list: row.lines.filter((l) => l.price !== null).map((l) => name(l.sid)).join(", "), total: fmt.eur0(row.total) });
@@ -406,7 +415,7 @@ function ExpertCard({ row, city, room, name, onSend, sending, sent, partial, tot
           <h3>{c.name} {c.demo && <span className="demo">{t("common.demo")}</span>}</h3>
           <Rating c={c} />
           <div className="row gap8">
-            <span className="pin-city"><PinIcon /> {city}</span>
+            <span className="pin-city"><PinIcon /> {canonicalCity(c.city) || c.city}</span>
             {c.experience ? <span className="small muted">{t("assist.experience", { n: c.experience })}</span> : null}
           </div>
         </div>

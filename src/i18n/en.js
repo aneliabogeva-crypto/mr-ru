@@ -376,7 +376,7 @@ export default {
   "assist.optional": "Not included",
   "assist.marketUnit": "market price {price} / {unit}",
   "assist.marketTotal": "Market estimate for the selection",
-  "assist.sofiaNote": "Market prices are for Sofia. In {city} they may differ – see local contractors' quotes in the next step.",
+  "assist.sofiaNote": "Market prices are for Sofia. Other cities may differ – see the local contractors' quotes.",
   "assist.diyNote": "I'll do myself: {list}.",
   "assist.partialTitle": "Cover part of the work ({n})",
   "assist.noneFull": "No contractor in {city} does all the selected work. See those covering part of it, or reduce the work.",
@@ -474,4 +474,7 @@ export default {
   "flow.coversAll": "all jobs",
   "flow.moreOffers": "and {n} more below",
   "flow.partialOnly": "No contractor does everything selected. The quotes below show who covers what; agree on the rest or hire a second contractor.",
+  "flow.mastersOther": "Contractors from other cities",
+  "flow.offersOther": "No contractors in {city} yet. Quotes from other cities:",
+  "flow.noneCityOther": "There are no contractors registered in {city} on Mr.Ru yet. Here are contractors from other cities with quotes at their prices – ask whether they travel to you. You can also get an online consultation.",
 };

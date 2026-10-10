@@ -256,7 +256,8 @@ const ratingKey = (c) => (c.reviews > 0 ? c.rating : 0);
  */
 export function matchContractors(contractors, city, qty, sort = "price") {
   const sids = Object.keys(qty);
-  const local = contractors.filter((c) => sameCity(c.city, city));
+  // city = null → всички градове (резервен вариант, когато в града още няма майстори).
+  const local = city ? contractors.filter((c) => sameCity(c.city, city)) : contractors;
   const rows = local.map((c) => {
     const lines = sids.map((sid) => {
       const p = priceOf(c, sid);
