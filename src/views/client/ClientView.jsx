@@ -88,7 +88,6 @@ export default function ClientView({ contractors, loading, market, notify }) {
   return (
     <>
       <section className="intro">
-        <span className="label">{t("client.eyebrow")}</span>
         <h1>{title}</h1>
         <p className="muted">{lead}</p>
       </section>
@@ -98,6 +97,7 @@ export default function ClientView({ contractors, loading, market, notify }) {
         <button type="button" aria-pressed={mode === "services"} onClick={() => setMode("services")}>{t("rooms.modeServices")}</button>
       </div>
 
+      {mode === "rooms" && !room && <RoomPicker value={null} onChange={pickRoom} />}
       {mode === "rooms" && !room && <ConsultPromo />}
 
       <div className="disc" role="note">
@@ -106,8 +106,6 @@ export default function ClientView({ contractors, loading, market, notify }) {
           <strong>{t("client.disclaimerTitle")}</strong> {t("client.disclaimer")}
         </p>
       </div>
-
-      {mode === "rooms" && !room && <RoomPicker value={null} onChange={pickRoom} />}
 
       {mode === "rooms" && room && (
         <div className="room-bar">
