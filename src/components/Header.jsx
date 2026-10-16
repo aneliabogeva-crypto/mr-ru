@@ -12,6 +12,9 @@ export default function Header({ role, onRole, newRequests = 0 }) {
           </span>
           <span className="tag">{t("brand.tagline")}</span>
         </div>
+        <button type="button" className={"nav-link" + (role === "pricing" ? " on" : "")} aria-current={role === "pricing" ? "page" : undefined} onClick={() => onRole("pricing")}>
+          {t("header.pricing")}
+        </button>
         <div className="seg" role="group" aria-label={t("header.mode")}>
           <button type="button" aria-pressed={role === "client"} onClick={() => onRole("client")}>
             {t("header.client")}

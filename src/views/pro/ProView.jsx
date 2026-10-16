@@ -8,6 +8,7 @@ import QuoteBuilder from "./QuoteBuilder.jsx";
 import { createQuote, quoteNumber } from "../../lib/quote.js";
 import { getMyContractor, listMyRequests, setRequestStatus, signOut, updateContractor } from "../../lib/api.js";
 import { useI18n } from "../../i18n/I18nProvider.jsx";
+import { TRIAL_DAYS, openPlan } from "../../lib/plans.js";
 
 const SAVE_DELAY = 700;
 
@@ -143,6 +144,14 @@ function Workspace({ user, market, notify, onProfileSaved }) {
           </div>
         </div>
       </section>
+
+      <div className="pro-plan" role="note">
+        <div className="min0">
+          <strong>{t("proPlan.current")}</strong>
+          <span className="muted"> {t("proPlan.text")}</span>
+        </div>
+        <button type="button" className="btn btn-s btn-p" onClick={() => openPlan("pro")}>{t("pricing.trial", { n: TRIAL_DAYS })}</button>
+      </div>
 
       <div className="tabs" role="tablist">
         {tabs.map((x) => (

@@ -30,7 +30,7 @@ export default function RoomPicker({ value, onChange, compact = false }) {
           key={id}
           role="radio"
           aria-checked={value === id}
-          className={(compact ? "room-card" : "room-tile") + (value === id ? " on" : "")}
+          className={(compact ? "room-card" : "room-tile") + ` room-${id}` + (value === id ? " on" : "")}
           onClick={() => onChange(id)}
         >
           <span className="room-ico"><RoomIcon id={id} size={compact ? 24 : 32} /></span>

@@ -158,3 +158,22 @@ export async function updatePassword(password) {
 export async function signOut() {
   await supabase.auth.signOut();
 }
+
+// ─── Абонаменти ────────────────────────────────────────────────────────────
+/**
+ * Заявка за план (supabase/2026-10-16-plan-requests.sql). Онлайн плащане още няма:
+ * екипът на Mr.Ru се свързва с човека и активира плана.
+ */
+export async function sendPlanRequest({ plan, audience, billing, name, email, phone, note }) {
+  unwrap(
+    await supabase.from("plan_requests").insert({
+      plan,
+      audience,
+      billing,
+      name: name.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      note: (note || "").trim(),
+    }),
+  );
+}

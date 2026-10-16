@@ -10,6 +10,7 @@ import {
 } from "../../../lib/flow/roomFlow.js";
 import { canonicalCity, normalizeCity, sameCity } from "../../../lib/cities.js";
 import { openConsult } from "../../../lib/consult.js";
+import { openPlan } from "../../../lib/plans.js";
 import { estimate } from "../../../lib/market.js";
 import { initials } from "../../../lib/format.js";
 import { phoneDigits, viberChatLink, whatsappLink } from "../../../lib/messaging.js";
@@ -233,6 +234,10 @@ export default function RoomFlow({ room, contractors, loading, market, client, o
                 {!isSofia && <p className="note">{t("assist.sofiaNote", { city })}</p>}
                 <OffersPreview rows={[...match.full, ...match.partial].slice(0, 3)} total={Object.keys(qty).length} more={nLocal} city={city} fromOther={fromOther} loading={loading} />
                 <button type="button" className="btn btn-p" onClick={toServices}>{nLocal ? tn("flow.toResults", nLocal) : t("flow.toResults")}</button>
+                <button type="button" className="upsell" onClick={() => openPlan("project", "once")}>
+                  <span className="upsell-t">{t("upsell.title")}</span>
+                  <span className="upsell-s">{t("upsell.text", { price: fmt.eur(9.9) })}</span>
+                </button>
               </>
             ) : (
               <p className="need-city">{t("flow.needCity")}</p>

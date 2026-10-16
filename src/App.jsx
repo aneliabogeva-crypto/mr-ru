@@ -4,6 +4,8 @@ import Toast, { useToast } from "./components/Toast.jsx";
 import Chatbot from "./components/Chatbot.jsx";
 import ClientView from "./views/client/ClientView.jsx";
 import ProView from "./views/pro/ProView.jsx";
+import Pricing from "./views/pricing/Pricing.jsx";
+import PlanDialog from "./views/pricing/PlanDialog.jsx";
 import { listContractors } from "./lib/api.js";
 import { computeMarket } from "./lib/market.js";
 import { usePersistentState } from "./lib/storage.js";
@@ -39,6 +41,18 @@ export default function App() {
     }
   }, [auth.event, setRole]);
 
+  // Бутоните „Започни безплатно“ от страницата с цени водят към калкулатора или кабинета.
+  useEffect(() => {
+    const go = (e) => {
+      if (["client", "pro", "pricing"].includes(e.detail)) {
+        setRole(e.detail);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    };
+    window.addEventListener("mrru:go", go);
+    return () => window.removeEventListener("mrru:go", go);
+  }, [setRole]);
+
   const market = useMemo(() => computeMarket(contractors), [contractors]);
 
   return (
@@ -54,7 +68,9 @@ export default function App() {
             </p>
           </div>
         )}
-        {role === "client" ? (
+        {role === "pricing" ? (
+          <Pricing />
+        ) : role === "client" ? (
           <ClientView contractors={contractors} loading={loadState === "loading"} market={market} notify={notify} />
         ) : (
           <ProView auth={auth} market={market} notify={notify} onProfileSaved={reloadContractors} />
@@ -62,6 +78,7 @@ export default function App() {
         <p className="note demo-note">{t("app.demoNote")}</p>
       </main>
       {role === "client" && <Chatbot market={market} />}
+      <PlanDialog notify={notify} />
       <Toast message={toast} />
     </>
   );
