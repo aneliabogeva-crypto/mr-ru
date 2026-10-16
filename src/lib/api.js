@@ -161,10 +161,10 @@ export async function signOut() {
 
 // ─── Абонаменти ────────────────────────────────────────────────────────────
 /**
- * Заявка за план (supabase/2026-10-16-plan-requests.sql). Онлайн плащане още няма:
- * екипът на Mr.Ru се свързва с човека и активира плана.
+ * Заявка за план с начин на плащане и основание (supabase/2026-10-16-plan-requests.sql).
+ * Плащането се разпознава по основанието MR-XXXXXX; EasyPay се потвърждава автоматично.
  */
-export async function sendPlanRequest({ plan, audience, billing, name, email, phone, note }) {
+export async function sendPlanRequest({ plan, audience, billing, name, email, phone, note, paymentMethod = "none", reference = null, amount = null }) {
   unwrap(
     await supabase.from("plan_requests").insert({
       plan,
@@ -174,6 +174,17 @@ export async function sendPlanRequest({ plan, audience, billing, name, email, ph
       email: email.trim(),
       phone: phone.trim(),
       note: (note || "").trim(),
+      payment_method: paymentMethod,
+      reference,
+      amount,
     }),
   );
+}
+
+/** Код за плащане в EasyPay от функцията easypay (supabase/functions/easypay). */
+export async function requestEasyPayCode(reference) {
+  const { data, error } = await supabase.functions.invoke("easypay", { body: { reference } });
+  if (error) throw error;
+  if (!data?.idn) throw new Error(data?.error || "easypay");
+  return data; // { idn, amount, expires }
 }

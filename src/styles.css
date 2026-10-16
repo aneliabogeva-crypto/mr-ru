@@ -849,3 +849,30 @@ hr{border-top:1px solid var(--line)}
   .deal{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center}
   .deal-big{grid-row:span 2;margin:0;font-size:32px;min-width:64px}
 }
+
+/* ═══ Плащане ═══ */
+.pay-methods{border:0;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pay-methods legend{font-size:14px;font-weight:500;padding:0;margin-bottom:8px}
+.pay-opt{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface);cursor:pointer;min-width:0}
+.pay-opt input{position:absolute;opacity:0;pointer-events:none}
+.pay-opt:hover{border-color:color-mix(in srgb,var(--teal) 45%,var(--line))}
+.pay-opt.on{border-color:var(--teal);background:var(--teal-soft)}
+.pay-opt:focus-within{outline:3px solid color-mix(in srgb,var(--teal) 45%,transparent);outline-offset:2px}
+.pay-opt.off{cursor:not-allowed;opacity:.55;border-style:dashed}
+.pay-ico{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:14px;color:var(--ink)}
+.pay-ico-card{background:var(--sw-lilac)} .pay-ico-revolut{background:var(--sw-sky)} .pay-ico-bank{background:var(--sw-sage)} .pay-ico-easypay{background:var(--sw-butter)}
+.pay-step{gap:14px}
+.pay-lead{font-size:16px}
+.pay-box{display:grid;gap:2px;padding:8px 14px;border-radius:18px;background:var(--surface-2)}
+.pay-row{display:grid;grid-template-columns:110px minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.pay-row:last-of-type{border-bottom:0}
+.pay-k{font-size:13.5px;color:var(--muted)}
+.pay-v{font-weight:600;overflow-wrap:anywhere}
+.pay-v.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.03em}
+.pay-copy{min-height:34px;padding:5px 12px;font-size:13px}
+a.plan-submit{text-decoration:none}
+@media (max-width:560px){
+  .pay-methods{grid-template-columns:minmax(0,1fr)}
+  .pay-row{grid-template-columns:minmax(0,1fr) auto}
+  .pay-k{grid-column:1/-1;margin-bottom:-6px}
+}
